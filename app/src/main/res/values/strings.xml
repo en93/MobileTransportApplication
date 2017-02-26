@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">MobileTransportApplication</string>
+    <string name="action_clear_data">Remove all stations</string>
+    <string name="StopsNavigationTitle">Stops</string>
+    <string name="location">Auckland</string>
+    <string name="title_activity_add_new_stop">AddNewStopActivity</string>
+    <string name="add_station">Add Station</string>
+</resources>
