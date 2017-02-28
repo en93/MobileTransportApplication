@@ -17,6 +17,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.CursorAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 
@@ -24,6 +25,9 @@ public class StopsNavigationActivity extends AppCompatActivity implements Loader
 
     private CursorAdapter cAdapter;
     private StationProvider stationProvider;
+
+    public static final String STOP_NUMBER = "StopNumber";
+    public static final String STOP_ADDRESS = "StopAddress";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,5 +93,18 @@ public class StopsNavigationActivity extends AppCompatActivity implements Loader
 
     private void restartLoader() {
         getLoaderManager().restartLoader(0, null, this);
+    }
+
+    public void showArrivals(View view) {
+        String stopNumber;
+        String stopAddress;
+        TextView tvId = (TextView) view.findViewById(R.id.tvStopNum);
+        TextView tvAd = (TextView) view.findViewById(R.id.tvStop);
+        stopNumber = tvId.getText().toString();
+        stopAddress = tvAd.getText().toString();
+        Intent intent = new Intent(this, ArrivalsActivity.class);
+        intent.putExtra(STOP_NUMBER, stopNumber);
+        intent.putExtra(STOP_ADDRESS, stopAddress);
+        startActivity(intent);
     }
 }

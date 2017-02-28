@@ -31,9 +31,19 @@
         </activity>
 
         <provider
-            android:authorities="com.example.ian.MobileTransportApplication.StationProvider"
             android:name=".StationProvider"
+            android:authorities="com.example.ian.MobileTransportApplication.StationProvider"
             android:exported="false"/>
+
+        <activity
+            android:name=".ArrivalsActivity"
+            android:label="@string/title_activity_arrivals"
+            android:parentActivityName=".StopsNavigationActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.development.ian.mobiletransportapplication.StopsNavigationActivity"/>
+        </activity>
     </application>
 
 </manifest>
