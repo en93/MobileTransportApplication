@@ -1,5 +1,6 @@
 package com.development.ian.mobiletransportapplication;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -19,6 +20,8 @@ public class AddNewStopActivity extends AppCompatActivity {
     private static Window window ;
     private static ProgressBar progressBar;
 
+    public static APIResponseHandler responseHandler = new APIResponseHandler();
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) { //todo pressing the tick on the android keyboard should have the same behaviour as pressing 'Add Station'
@@ -36,7 +39,7 @@ public class AddNewStopActivity extends AppCompatActivity {
             @Override
             public void onClick(View v){
                 RemoveUserControl();
-                API.GetStopById(editIdText.getText().toString(), getApplicationContext());
+                API.GetStopById(editIdText.getText().toString(), getApplicationContext(), findViewById(R.id.add_new_layout));
 
             }
         });
@@ -47,7 +50,7 @@ public class AddNewStopActivity extends AppCompatActivity {
                 RemoveUserControl();
                 ArrayList<Integer> list = GetSampleStops();
                 for (Integer b : list) {
-                    API.GetStopById(b.toString(), getApplicationContext());
+                    API.GetStopById(b.toString(), getApplicationContext(), findViewById(R.id.add_new_layout));
                 }
             }
         });
@@ -60,22 +63,22 @@ public class AddNewStopActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        AtApiManager.CancelRequests();
         window.clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
         if(progressBar.getVisibility()==View.VISIBLE){
             progressBar.setVisibility(View.GONE);
+            AtApiManager.CancelRequests();
 
         }else {
             super.onBackPressed();
         }
     }
 
-private ArrayList<Integer> GetSampleStops() {
-    ArrayList<Integer> samples = new ArrayList<Integer>();
-    samples.add(7230);
-    samples.add(7231);
-    samples.add(7232);
-    return samples;
+    private ArrayList<Integer> GetSampleStops() {
+        ArrayList<Integer> samples = new ArrayList<Integer>();
+        samples.add(7230);
+        samples.add(7231);
+        samples.add(7232);
+        return samples;
 }
 
     @Override
@@ -88,16 +91,4 @@ private ArrayList<Integer> GetSampleStops() {
         window.clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
         progressBar.setVisibility(View.GONE);
     }
-
-    public static void displaySncakbarMessage(String message){ //todo display snackbar after adding a record to the database
-
-    }
-
-
-
-
-
-
-
-
 }

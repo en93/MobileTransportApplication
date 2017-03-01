@@ -17,6 +17,7 @@ public class ArrivalsActivity extends AppCompatActivity {
     private TextView title;
     private TextView subtitle;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

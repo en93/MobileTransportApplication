@@ -11,11 +11,8 @@ import com.android.volley.toolbox.DiskBasedCache;
 import com.android.volley.toolbox.HurlStack;
 import com.android.volley.toolbox.JsonObjectRequest;
 
-import android.content.ContentValues;
 import android.content.Context;
-import android.support.design.widget.Snackbar;
-import android.util.Log;
-import android.widget.Toast;
+import android.view.View;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -31,6 +28,7 @@ import java.util.Map;
 public class AtApiManager {
 
     public static final String REQUEST_STOP_URL = "https://api.at.govt.nz/v2/gtfs/stops/stopId/";
+    public static final String REQUEST_STOP_TIMES_URL = "api.at.govt.nz/v2/gtfs/stopTimes/stopId/";
     private static AtApiManager APIAccess = new AtApiManager();
 
     private final String SUBKEYLABEL = "Ocp-Apim-Subscription-Key";
@@ -42,7 +40,7 @@ public class AtApiManager {
     static RequestQueue requestQueue;
 
 
-    public void GetStopById(final String id, final Context context){
+    public void GetStopById(final String id, final Context context, final View view){
         if(requestQueue == null) {
             StartRequestQueue(context);
         }
@@ -57,14 +55,15 @@ public class AtApiManager {
                try { //todo handle incorrect input of stop id
                    dataArray = response.getJSONArray("response");
                    dataObject = dataArray.getJSONObject(0);
-                   ContentValues values = new ContentValues();
-                   values.put(DBHelper.STOPS_ID, id);
-                   values.put(DBHelper.STOPS_NAME, dataObject.getString("stop_name"));
-                   values.put(DBHelper.STOPS_LAT, Double.parseDouble(dataObject.getString("stop_lat")));
-                   values.put(DBHelper.STOPS_LON, Double.parseDouble(dataObject.getString("stop_lon")));
-                   stationProvider.insert(StationProvider.CONTENT_URI, values);
-                   AddNewStopActivity.restoreUserControl();
-                   AddNewStopActivity.displaySncakbarMessage(values.get(DBHelper.STOPS_ID) + " has been added");
+                   AddNewStopActivity.responseHandler.onSuccess(AtApiManager.TAG.getStop, dataObject, view);
+//                   ContentValues values = new ContentValues();
+//                   values.put(DBHelper.STOPS_ID, id);
+//                   values.put(DBHelper.STOPS_NAME, dataObject.getString("stop_name"));
+//                   values.put(DBHelper.STOPS_LAT, Double.parseDouble(dataObject.getString("stop_lat")));
+//                   values.put(DBHelper.STOPS_LON, Double.parseDouble(dataObject.getString("stop_lon")));
+//                   stationProvider.insert(StationProvider.CONTENT_URI, values);
+//                   AddNewStopActivity.restoreUserControl();
+//                   AddNewStopActivity.displaySncakbarMessage(values.get(DBHelper.STOPS_ID) + " has been added");
 
                } catch (JSONException e) {
                    e.printStackTrace();
@@ -86,9 +85,13 @@ public class AtApiManager {
             }
 
         };
-        jsonRequest.setTag(TAG.json);
+        jsonRequest.setTag(TAG.getStop);
         requestQueue.add(jsonRequest);
         return;
+    }
+
+    public void GetStopTimesById(){
+
     }
 
     private void StartRequestQueue(Context context) {
@@ -108,13 +111,14 @@ public class AtApiManager {
     public static void CancelRequests(){
         try {
             if(requestQueue!=null) {
-                requestQueue.cancelAll(TAG.json);
+                requestQueue.cancelAll(TAG.getStop);
+                requestQueue.cancelAll(TAG.getArrivals);
             }
         }catch (Exception e){
 
         }
     }
 
-    public enum TAG{json}
+    public enum TAG{getStop, getArrivals}
 }
 
