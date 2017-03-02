@@ -10,7 +10,7 @@ import org.json.JSONObject;
  */
 
 public interface responseHandler {
-    public void onSuccess(AtApiManager.TAG tag, JSONObject dataObject, View view);
+    public void onSuccess(AtApiManager.TAG tag, JSONObject dataObject);
     public void onFailure();
 }
 

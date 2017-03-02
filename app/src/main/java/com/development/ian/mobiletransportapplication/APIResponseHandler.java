@@ -4,6 +4,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.support.design.widget.Snackbar;
 import android.view.View;
+import android.widget.EditText;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -14,10 +15,20 @@ import org.json.JSONObject;
 
 public class APIResponseHandler implements responseHandler {
 
+    private View view;
+    private EditText editText;
+
     private StationProvider stationProvider = new StationProvider();
 
+    public APIResponseHandler(View view, EditText editText){
+        this.view = view;
+        this.editText = editText;
+    }
+
+
+
     @Override
-    public void onSuccess(AtApiManager.TAG tag, JSONObject dataObject, View view) {
+    public void onSuccess(AtApiManager.TAG tag, JSONObject dataObject) {
         if(tag == AtApiManager.TAG.getStop){
             try {
                 ContentValues values = new ContentValues();
@@ -39,6 +50,7 @@ public class APIResponseHandler implements responseHandler {
 
     @Override
     public void onFailure() {
-
+        AddNewStopActivity.restoreUserControl();
+        Snackbar.make(view, "Stop " + editText.getText() + " is not a valid stop", Snackbar.LENGTH_SHORT).show();
     }
 }

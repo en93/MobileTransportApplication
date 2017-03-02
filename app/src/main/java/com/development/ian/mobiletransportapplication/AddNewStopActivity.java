@@ -20,7 +20,7 @@ public class AddNewStopActivity extends AppCompatActivity {
     private static Window window ;
     private static ProgressBar progressBar;
 
-    public static APIResponseHandler responseHandler = new APIResponseHandler();
+    public static responseHandler responseHandler;
 
 
     @Override
@@ -35,11 +35,12 @@ public class AddNewStopActivity extends AppCompatActivity {
         final Button addSample = (Button) findViewById(R.id.addSample);
         final EditText editIdText = (EditText) findViewById(R.id.editIdText);
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
+        responseHandler = new APIResponseHandler(findViewById(R.id.add_new_layout), editIdText);
         addStop.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v){
                 RemoveUserControl();
-                API.GetStopById(editIdText.getText().toString(), getApplicationContext(), findViewById(R.id.add_new_layout));
+                API.GetStopById(editIdText.getText().toString(), getApplicationContext());
 
             }
         });
@@ -50,7 +51,7 @@ public class AddNewStopActivity extends AppCompatActivity {
                 RemoveUserControl();
                 ArrayList<Integer> list = GetSampleStops();
                 for (Integer b : list) {
-                    API.GetStopById(b.toString(), getApplicationContext(), findViewById(R.id.add_new_layout));
+                    API.GetStopById(b.toString(), getApplicationContext());
                 }
             }
         });

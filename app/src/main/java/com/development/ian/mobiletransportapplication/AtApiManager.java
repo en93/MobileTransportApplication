@@ -40,7 +40,7 @@ public class AtApiManager {
     static RequestQueue requestQueue;
 
 
-    public void GetStopById(final String id, final Context context, final View view){
+    public void GetStopById(final String id, final Context context){
         if(requestQueue == null) {
             StartRequestQueue(context);
         }
@@ -52,21 +52,12 @@ public class AtApiManager {
                JSONArray dataArray;
                JSONObject dataObject;
 
-               try { //todo handle incorrect input of stop id
+               try { 
                    dataArray = response.getJSONArray("response");
                    dataObject = dataArray.getJSONObject(0);
-                   AddNewStopActivity.responseHandler.onSuccess(AtApiManager.TAG.getStop, dataObject, view);
-//                   ContentValues values = new ContentValues();
-//                   values.put(DBHelper.STOPS_ID, id);
-//                   values.put(DBHelper.STOPS_NAME, dataObject.getString("stop_name"));
-//                   values.put(DBHelper.STOPS_LAT, Double.parseDouble(dataObject.getString("stop_lat")));
-//                   values.put(DBHelper.STOPS_LON, Double.parseDouble(dataObject.getString("stop_lon")));
-//                   stationProvider.insert(StationProvider.CONTENT_URI, values);
-//                   AddNewStopActivity.restoreUserControl();
-//                   AddNewStopActivity.displaySncakbarMessage(values.get(DBHelper.STOPS_ID) + " has been added");
-
+                   AddNewStopActivity.responseHandler.onSuccess(AtApiManager.TAG.getStop, dataObject);
                } catch (JSONException e) {
-                   e.printStackTrace();
+                   AddNewStopActivity.responseHandler.onFailure();
                }catch (Exception e){
                    e.printStackTrace();
                }
@@ -114,9 +105,7 @@ public class AtApiManager {
                 requestQueue.cancelAll(TAG.getStop);
                 requestQueue.cancelAll(TAG.getArrivals);
             }
-        }catch (Exception e){
-
-        }
+        }catch (Exception e){}
     }
 
     public enum TAG{getStop, getArrivals}
