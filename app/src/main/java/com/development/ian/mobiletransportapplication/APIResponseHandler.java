@@ -5,6 +5,7 @@ import android.content.Context;
 import android.support.design.widget.Snackbar;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.ListView;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -16,16 +17,19 @@ import org.json.JSONObject;
 public class APIResponseHandler implements responseHandler {
 
     private View view;
-    private EditText editText;
+    private ListView list;
+
 
     private StationProvider stationProvider = new StationProvider();
 
-    public APIResponseHandler(View view, EditText editText){
+    public APIResponseHandler(View view){
         this.view = view;
-        this.editText = editText;
     }
 
-
+    public APIResponseHandler(View view, ListView list){
+        this.view = view;
+        this.list = list;
+    }
 
     @Override
     public void onSuccess(AtApiManager.TAG tag, JSONObject dataObject) {
@@ -39,18 +43,23 @@ public class APIResponseHandler implements responseHandler {
                 stationProvider.insert(StationProvider.CONTENT_URI, values);
                 AddNewStopActivity.restoreUserControl();
                 Snackbar.make(view, "Stop " + values.get(DBHelper.STOPS_ID) + " has been added", Snackbar.LENGTH_SHORT).show();
-//                AddNewStopActivity.displaySncakbarMessage(values.get(DBHelper.STOPS_ID) + " has been added");
             }catch (JSONException jEx){
 
+            }finally {
+                return;
             }
-
+        }
+        else if(tag == AtApiManager.TAG.getArrivals){
+            Snackbar.make(view, "Message received, handling not yet implemented", Snackbar.LENGTH_SHORT).show();
         }
     }
 
 
     @Override
-    public void onFailure() {
-        AddNewStopActivity.restoreUserControl();
-        Snackbar.make(view, "Stop " + editText.getText() + " is not a valid stop", Snackbar.LENGTH_SHORT).show();
+    public void onFailure(AtApiManager.TAG tag, String detail) {
+        if(tag == AtApiManager.TAG.getStop) {
+            AddNewStopActivity.restoreUserControl();
+            Snackbar.make(view, "Stop " + detail + " is not a valid stop", Snackbar.LENGTH_SHORT).show();
+        }
     }
 }

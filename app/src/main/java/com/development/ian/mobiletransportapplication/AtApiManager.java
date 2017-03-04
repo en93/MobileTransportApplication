@@ -28,7 +28,7 @@ import java.util.Map;
 public class AtApiManager {
 
     public static final String REQUEST_STOP_URL = "https://api.at.govt.nz/v2/gtfs/stops/stopId/";
-    public static final String REQUEST_STOP_TIMES_URL = "api.at.govt.nz/v2/gtfs/stopTimes/stopId/";
+    public static final String REQUEST_Arrival_TIMES_URL = "https://api.at.govt.nz/v2/gtfs/stopTimes/stopId/";
     private static AtApiManager APIAccess = new AtApiManager();
 
     private final String SUBKEYLABEL = "Ocp-Apim-Subscription-Key";
@@ -52,12 +52,12 @@ public class AtApiManager {
                JSONArray dataArray;
                JSONObject dataObject;
 
-               try { 
+               try {
                    dataArray = response.getJSONArray("response");
                    dataObject = dataArray.getJSONObject(0);
                    AddNewStopActivity.responseHandler.onSuccess(AtApiManager.TAG.getStop, dataObject);
                } catch (JSONException e) {
-                   AddNewStopActivity.responseHandler.onFailure();
+                   AddNewStopActivity.responseHandler.onFailure(AtApiManager.TAG.getStop, id);
                }catch (Exception e){
                    e.printStackTrace();
                }
@@ -78,11 +78,35 @@ public class AtApiManager {
         };
         jsonRequest.setTag(TAG.getStop);
         requestQueue.add(jsonRequest);
-        return;
     }
 
-    public void GetStopTimesById(){
+    public void getArrivalTimes(String id, Context context){
+        if(requestQueue == null) {
+            StartRequestQueue(context);
+        }
+        String requestUrl = REQUEST_Arrival_TIMES_URL  + id;
+        JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.GET, requestUrl, null, new Response.Listener<JSONObject>(){
 
+            @Override
+            public void onResponse(JSONObject response){
+                JSONArray dataArray;
+                JSONObject dataObject = new JSONObject();
+                //todo handle response, at the moment display response was received
+                ArrivalsActivity.responseHandler.onSuccess(TAG.getArrivals, dataObject);
+            }
+        }, new Response.ErrorListener() {
+            @Override
+                public void onErrorResponse(VolleyError error) {}
+        }){
+                @Override
+                public Map<String, String> getHeaders() throws AuthFailureError{
+                    Map<String, String> headers = new HashMap<String, String>();
+                    headers.put(SUBKEYLABEL, KEY);
+                    return headers;
+                }
+            };
+        jsonRequest.setTag(TAG.getArrivals);
+        requestQueue.add(jsonRequest);
     }
 
     private void StartRequestQueue(Context context) {

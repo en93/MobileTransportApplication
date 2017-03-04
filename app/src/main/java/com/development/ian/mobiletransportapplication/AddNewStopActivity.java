@@ -1,6 +1,5 @@
 package com.development.ian.mobiletransportapplication;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -15,7 +14,7 @@ import java.util.ArrayList;
 
 public class AddNewStopActivity extends AppCompatActivity {
 
-    private AtApiManager API = AtApiManager.getInstance();
+    private AtApiManager APIAccess = AtApiManager.getInstance();
 
     private static Window window ;
     private static ProgressBar progressBar;
@@ -35,12 +34,13 @@ public class AddNewStopActivity extends AppCompatActivity {
         final Button addSample = (Button) findViewById(R.id.addSample);
         final EditText editIdText = (EditText) findViewById(R.id.editIdText);
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
-        responseHandler = new APIResponseHandler(findViewById(R.id.add_new_layout), editIdText);
+//        responseHandler = new APIResponseHandler(findViewById(R.id.add_new_layout), editIdText);
+        responseHandler = new APIResponseHandler(findViewById(R.id.add_new_layout));
         addStop.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v){
                 RemoveUserControl();
-                API.GetStopById(editIdText.getText().toString(), getApplicationContext());
+                APIAccess.GetStopById(editIdText.getText().toString(), getApplicationContext());
 
             }
         });
@@ -51,7 +51,7 @@ public class AddNewStopActivity extends AppCompatActivity {
                 RemoveUserControl();
                 ArrayList<Integer> list = GetSampleStops();
                 for (Integer b : list) {
-                    API.GetStopById(b.toString(), getApplicationContext());
+                    APIAccess.GetStopById(b.toString(), getApplicationContext());
                 }
             }
         });

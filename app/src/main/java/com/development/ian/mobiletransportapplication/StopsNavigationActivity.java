@@ -100,7 +100,7 @@ public class StopsNavigationActivity extends AppCompatActivity implements Loader
         String stopAddress;
         TextView tvId = (TextView) view.findViewById(R.id.tvStopNum);
         TextView tvAd = (TextView) view.findViewById(R.id.tvStop);
-        stopNumber = tvId.getText().toString();
+        stopNumber = tvId.getText().toString().substring(6);
         stopAddress = tvAd.getText().toString();
         Intent intent = new Intent(this, ArrivalsActivity.class);
         intent.putExtra(STOP_NUMBER, stopNumber);
