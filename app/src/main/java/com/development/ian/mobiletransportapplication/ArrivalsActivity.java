@@ -41,7 +41,7 @@ public class ArrivalsActivity extends AppCompatActivity {
         title.setText(stopName);
         subtitle.setText("Stop: " + stopNumber);
 
-        responseHandler = new APIResponseHandler(findViewById(R.id.arrivals_layout), list);
+        responseHandler = new APIResponseHandler(findViewById(R.id.arrivals_layout), list, this);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         APIAccess.getArrivalTimes(stopNumber, getApplicationContext());
     }

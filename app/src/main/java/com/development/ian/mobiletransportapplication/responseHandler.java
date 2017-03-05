@@ -3,6 +3,7 @@ package com.development.ian.mobiletransportapplication;
 import android.content.Context;
 import android.view.View;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 /**
@@ -10,7 +11,7 @@ import org.json.JSONObject;
  */
 
 public interface responseHandler {
-    public void onSuccess(AtApiManager.TAG tag, JSONObject dataObject);
+    public void onSuccess(AtApiManager.TAG tag, JSONArray dataArray);
     public void onFailure(AtApiManager.TAG tag, String detail);
 }
 

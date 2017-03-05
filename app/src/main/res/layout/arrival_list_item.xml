@@ -24,7 +24,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_toRightOf="@id/imageBus"
-        android:text="720"
+        android:text="XYZ"
         android:textColor="@color/bright_foreground_disabled_material_light"
         android:textSize="30sp"
         android:paddingTop="7dp"

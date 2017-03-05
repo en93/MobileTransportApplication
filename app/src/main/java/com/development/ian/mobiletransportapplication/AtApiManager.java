@@ -50,12 +50,9 @@ public class AtApiManager {
            @Override
             public void onResponse(JSONObject response){
                JSONArray dataArray;
-               JSONObject dataObject;
-
                try {
                    dataArray = response.getJSONArray("response");
-                   dataObject = dataArray.getJSONObject(0);
-                   AddNewStopActivity.responseHandler.onSuccess(AtApiManager.TAG.getStop, dataObject);
+                   AddNewStopActivity.responseHandler.onSuccess(AtApiManager.TAG.getStop, dataArray);
                } catch (JSONException e) {
                    AddNewStopActivity.responseHandler.onFailure(AtApiManager.TAG.getStop, id);
                }catch (Exception e){
@@ -80,7 +77,7 @@ public class AtApiManager {
         requestQueue.add(jsonRequest);
     }
 
-    public void getArrivalTimes(String id, Context context){
+    public void getArrivalTimes(final String id, Context context){
         if(requestQueue == null) {
             StartRequestQueue(context);
         }
@@ -90,9 +87,15 @@ public class AtApiManager {
             @Override
             public void onResponse(JSONObject response){
                 JSONArray dataArray;
-                JSONObject dataObject = new JSONObject();
-                //todo handle response, at the moment display response was received
-                ArrivalsActivity.responseHandler.onSuccess(TAG.getArrivals, dataObject);
+
+                try {
+                    dataArray = response.getJSONArray("response");
+                    ArrivalsActivity.responseHandler.onSuccess(TAG.getArrivals, dataArray);
+                } catch (JSONException e) {
+                    ArrivalsActivity.responseHandler.onFailure(AtApiManager.TAG.getStop, id);
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
             }
         }, new Response.ErrorListener() {
             @Override

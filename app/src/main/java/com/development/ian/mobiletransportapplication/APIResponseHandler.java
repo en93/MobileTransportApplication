@@ -7,8 +7,11 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.ListView;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.ArrayList;
 
 /**
  * Created by Ian on 3/1/2017.
@@ -18,6 +21,7 @@ public class APIResponseHandler implements responseHandler {
 
     private View view;
     private ListView list;
+    private Context context;
 
 
     private StationProvider stationProvider = new StationProvider();
@@ -26,15 +30,17 @@ public class APIResponseHandler implements responseHandler {
         this.view = view;
     }
 
-    public APIResponseHandler(View view, ListView list){
+    public APIResponseHandler(View view, ListView list, Context context){
         this.view = view;
         this.list = list;
+        this.context = context;
     }
 
     @Override
-    public void onSuccess(AtApiManager.TAG tag, JSONObject dataObject) {
+    public void onSuccess(AtApiManager.TAG tag, JSONArray dataArray) {
         if(tag == AtApiManager.TAG.getStop){
             try {
+                JSONObject dataObject = dataArray.getJSONObject(0);
                 ContentValues values = new ContentValues();
                 values.put(DBHelper.STOPS_ID, dataObject.getString("stop_id"));
                 values.put(DBHelper.STOPS_NAME, dataObject.getString("stop_name"));
@@ -50,7 +56,25 @@ public class APIResponseHandler implements responseHandler {
             }
         }
         else if(tag == AtApiManager.TAG.getArrivals){
-            Snackbar.make(view, "Message received, handling not yet implemented", Snackbar.LENGTH_SHORT).show();
+//            Snackbar.make(view, "Message received, handling not yet implemented", Snackbar.LENGTH_SHORT).show();
+            ArrayList<BusArrival> arrivalList = new ArrayList<BusArrival>();
+            try{
+                JSONObject dataObject;
+                for (int i = 0; i<dataArray.length(); i++) {
+                    dataObject = dataArray.getJSONObject(i);
+                    arrivalList.add(new BusArrival(dataObject.getString("arrival_time")));
+                }
+
+                //todo sort array by time
+
+
+                ArrivalAdapter adapter = new ArrivalAdapter(context, R.layout.arrival_list_item, arrivalList);
+                list.setAdapter(adapter);
+            }catch (JSONException e){
+
+            }
+
+
         }
     }
 
