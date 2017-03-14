@@ -12,6 +12,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
 /**
  * Created by Ian on 3/1/2017.
@@ -62,19 +64,18 @@ public class APIResponseHandler implements responseHandler {
                 JSONObject dataObject;
                 for (int i = 0; i<dataArray.length(); i++) {
                     dataObject = dataArray.getJSONObject(i);
-                    arrivalList.add(new BusArrival(dataObject.getString("arrival_time")));
+                    arrivalList.add(new BusArrival(dataObject.getString("arrival_time"), "???", dataObject.getInt("arrival_time_seconds") ));
                 }
 
                 //todo sort array by time
 
+                Collections.sort(arrivalList, new BusTimeComparator());
 
                 ArrivalAdapter adapter = new ArrivalAdapter(context, R.layout.arrival_list_item, arrivalList);
                 list.setAdapter(adapter);
             }catch (JSONException e){
 
             }
-
-
         }
     }
 
@@ -86,4 +87,13 @@ public class APIResponseHandler implements responseHandler {
             Snackbar.make(view, "Stop " + detail + " is not a valid stop", Snackbar.LENGTH_SHORT).show();
         }
     }
+
+    class BusTimeComparator implements Comparator<BusArrival>{
+
+        @Override
+        public int compare(BusArrival t1, BusArrival t2) {
+            return Integer.compare(t1.getArrivalSeconds(), t2.getArrivalSeconds());
+        }
+    }
+
 }
