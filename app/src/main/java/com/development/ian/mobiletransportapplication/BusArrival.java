@@ -10,6 +10,8 @@ public class BusArrival {
     private String tripId;
     private int arrivalSeconds;
 
+    public final static String PLACE_HOLDER = "...";
+
 
     public BusArrival(){}
     public BusArrival(String time){ arrivalTime = time;}
@@ -18,7 +20,7 @@ public class BusArrival {
 
         this.arrivalSeconds = arrivalSeconds;
         this.tripId = tripId;
-        this.route = "loading";
+        this.route = PLACE_HOLDER;
     }
 
     public String getArrivalTime() {

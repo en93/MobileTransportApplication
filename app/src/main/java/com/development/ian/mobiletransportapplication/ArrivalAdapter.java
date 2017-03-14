@@ -42,8 +42,10 @@ public class ArrivalAdapter extends ArrayAdapter<BusArrival> {
 //        route.setText(busArrival.getRouteNum());
         route.setText(busArrival.getRoute());
         time.setText(busArrival.getArrivalTime());
-        responseHandler = new APIResponseHandler(route, busArrival);
-        APIAccess.getRouteId(busArrival.getTripId(), responseHandler, context.getApplicationContext());
+        if(busArrival.getRoute() == BusArrival.PLACE_HOLDER) {
+            responseHandler = new APIResponseHandler(route, busArrival);
+            APIAccess.getRouteId(busArrival.getTripId(), responseHandler, context.getApplicationContext());
+        }
         return v;
     }
 }
