@@ -6,6 +6,7 @@ import android.support.design.widget.Snackbar;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -25,6 +26,9 @@ public class APIResponseHandler implements responseHandler {
     private ListView list;
     private Context context;
 
+    private BusArrival busArrival;
+
+    private AtApiManager APIAccess = AtApiManager.getInstance();
 
     private StationProvider stationProvider = new StationProvider();
 
@@ -32,11 +36,17 @@ public class APIResponseHandler implements responseHandler {
         this.view = view;
     }
 
+    public APIResponseHandler(View view, BusArrival busArrival){
+        this.view = view;
+        this.busArrival = busArrival;
+    }
+
     public APIResponseHandler(View view, ListView list, Context context){
         this.view = view;
         this.list = list;
         this.context = context;
     }
+
 
     @Override
     public void onSuccess(AtApiManager.TAG tag, JSONArray dataArray) {
@@ -64,7 +74,7 @@ public class APIResponseHandler implements responseHandler {
                 JSONObject dataObject;
                 for (int i = 0; i<dataArray.length(); i++) {
                     dataObject = dataArray.getJSONObject(i);
-                    arrivalList.add(new BusArrival(dataObject.getString("arrival_time"), "???", dataObject.getInt("arrival_time_seconds") ));
+                    arrivalList.add(new BusArrival(dataObject.getString("arrival_time"), dataObject.getInt("arrival_time_seconds"), dataObject.getString("trip_id") ));
                 }
 
                 //todo sort array by time
@@ -73,6 +83,26 @@ public class APIResponseHandler implements responseHandler {
 
                 ArrivalAdapter adapter = new ArrivalAdapter(context, R.layout.arrival_list_item, arrivalList);
                 list.setAdapter(adapter);
+            }catch (JSONException e){
+
+            }
+        }
+        else if(tag == AtApiManager.TAG.getRouteID){
+            try {
+                JSONObject dataObject = dataArray.getJSONObject(0);
+                String routeID = dataObject.getString("route_id");
+                APIAccess.getRouteName(routeID, this, context );
+            }catch (JSONException e){
+
+            }
+        }
+        else if(tag == AtApiManager.TAG.getRouteName){
+            try {
+                JSONObject dataObject = dataArray.getJSONObject(0);
+                String routeName = dataObject.getString("route_short_name");
+                TextView textView = (TextView) view;
+                textView.setText(routeName);
+                busArrival.setRoute(routeName);
             }catch (JSONException e){
 
             }

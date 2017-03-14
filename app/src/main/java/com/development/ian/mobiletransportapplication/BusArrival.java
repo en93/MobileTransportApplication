@@ -7,11 +7,19 @@ package com.development.ian.mobiletransportapplication;
 public class BusArrival {
     private String arrivalTime;
     private String route;
+    private String tripId;
     private int arrivalSeconds;
+
 
     public BusArrival(){}
     public BusArrival(String time){ arrivalTime = time;}
-    public BusArrival(String time, String route, int arrivalSeconds){ arrivalTime = time; this.route = route; this.arrivalSeconds = arrivalSeconds;}
+    public BusArrival(String time, int arrivalSeconds, String tripId){
+        arrivalTime = time;
+
+        this.arrivalSeconds = arrivalSeconds;
+        this.tripId = tripId;
+        this.route = "loading";
+    }
 
     public String getArrivalTime() {
         return arrivalTime;
@@ -29,6 +37,9 @@ public class BusArrival {
 
     public int getArrivalSeconds(){return arrivalSeconds;}
     public void setArrivalSeconds(int arrivalSeconds){this.arrivalSeconds=arrivalSeconds;}
+
+    public String getTripId(){        return tripId;    }
+    public void setTripId(String tripId){this.tripId=tripId;}
 
 
 }

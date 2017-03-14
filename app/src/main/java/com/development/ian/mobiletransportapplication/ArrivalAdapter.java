@@ -17,10 +17,16 @@ import java.util.List;
 public class ArrivalAdapter extends ArrayAdapter<BusArrival> {
 
     private ArrayList<BusArrival> arrivals;
+    private Context context;
+
+    private AtApiManager APIAccess = AtApiManager.getInstance();
+    public APIResponseHandler responseHandler;
+
 
     public ArrivalAdapter(Context context, int resource, List<BusArrival> objects) {
         super(context, resource, objects);
         this.arrivals = (ArrayList<BusArrival>) objects;
+        this.context = context;
     }
 
 
@@ -31,10 +37,13 @@ public class ArrivalAdapter extends ArrayAdapter<BusArrival> {
             v = inflater.inflate(R.layout.arrival_list_item, null);
         }
         BusArrival busArrival = arrivals.get(position);
-//        TextView route = (TextView) v.findViewById(R.id.routeNum);
+        TextView route = (TextView) v.findViewById(R.id.routeNum);
         TextView time = (TextView) v.findViewById(R.id.arrivalTime);
 //        route.setText(busArrival.getRouteNum());
+        route.setText(busArrival.getRoute());
         time.setText(busArrival.getArrivalTime());
+        responseHandler = new APIResponseHandler(route, busArrival);
+        APIAccess.getRouteId(busArrival.getTripId(), responseHandler, context.getApplicationContext());
         return v;
     }
 }
