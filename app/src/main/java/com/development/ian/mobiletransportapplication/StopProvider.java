@@ -11,10 +11,10 @@ import android.support.annotation.Nullable;
  * Created by Ian on 2/22/2017.
  */
 
-public class StationProvider extends ContentProvider {
+public class StopProvider extends ContentProvider {
 
-    private static final String AUTHORITY = "com.example.ian.MobileTransportApplication.StationProvider";
-    private static final String BASE_PATH = "StationData";
+    private static final String AUTHORITY = "com.example.ian.MobileTransportApplication.StopProvider";
+    private static final String BASE_PATH = "StopData";
     public static final Uri CONTENT_URI = Uri.parse("content://" + AUTHORITY + "/" + BASE_PATH );
 
     private static SQLiteDatabase ATData;
@@ -33,7 +33,7 @@ public class StationProvider extends ContentProvider {
     @Nullable
     @Override
     public Cursor query(Uri uri, String[] strings, String s, String[] strings1, String s1) {
-        return ATData.query(DBHelper.STOPS_TABLE, DBHelper.STOPS_COLUMNS, s,null, null,null, DBHelper.STOPS_ID + " DESC");
+        return ATData.query(DBHelper.STOP_TABLE, DBHelper.STOPS_COLUMNS, s,null, null,null, DBHelper.STOPS_ID + " DESC");
     }
 
     @Nullable
@@ -43,17 +43,17 @@ public class StationProvider extends ContentProvider {
     @Nullable
     @Override
     public Uri insert(Uri uri, ContentValues contentValues) {
-        long id = ATData.insert(DBHelper.STOPS_TABLE, null, contentValues);
+        long id = ATData.insert(DBHelper.STOP_TABLE, null, contentValues);
         return Uri.parse(BASE_PATH + "/" + id);
     }
 
     @Override
     public int delete(Uri uri, String s, String[] strings) {
-        return ATData.delete(DBHelper.STOPS_TABLE, s, strings);
+        return ATData.delete(DBHelper.STOP_TABLE, s, strings);
     }
 
     @Override
     public int update(Uri uri, ContentValues contentValues, String s, String[] strings) {
-        return ATData.update(DBHelper.STOPS_TABLE, contentValues, s, strings);
+        return ATData.update(DBHelper.STOP_TABLE, contentValues, s, strings);
     }
 }

@@ -40,8 +40,10 @@ public class AtApiManager {
     static Network network;
     static RequestQueue requestQueue;
 
+    private Context context;
 
-    public void GetStopById(final String id, final Context context){
+
+    public void GetStopById(final String id, final Context context, final APIResponseHandler responseHandler){
         ConfirmQueueRunning(context);
         String requestUrl = REQUEST_STOP_URL + id;
         JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.GET, requestUrl, null, new Response.Listener<JSONObject>(){
@@ -51,9 +53,9 @@ public class AtApiManager {
                JSONArray dataArray;
                try {
                    dataArray = response.getJSONArray("response");
-                   AddNewStopActivity.responseHandler.onSuccess(AtApiManager.TAG.getStop, dataArray);
+                   responseHandler.onSuccess(AtApiManager.TAG.getStop, dataArray);
                } catch (JSONException e) {
-                   AddNewStopActivity.responseHandler.onFailure(AtApiManager.TAG.getStop, id);
+                   responseHandler.onFailure(AtApiManager.TAG.getStop, id);
                }catch (Exception e){
                    e.printStackTrace();
                }
@@ -61,7 +63,7 @@ public class AtApiManager {
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-
+                //todo throw errors
             }
         }){
             @Override
@@ -111,12 +113,17 @@ public class AtApiManager {
 
     private void ConfirmQueueRunning(Context context) {
         if(requestQueue == null) {
+            this.context = context;
             StartRequestQueue(context);
         }
     }
 
-    public void getRouteId(final String id, final APIResponseHandler responseHandlerForAdapter, Context context){
-        ConfirmQueueRunning(context);
+    private void ConfirmQueueRunning() {
+        ConfirmQueueRunning(this.context);
+    }
+
+    public void getRouteId(final String id, final APIResponseHandler responseHandlerForAdapter){
+        ConfirmQueueRunning();
         String requestUrl = REQUEST_ROUTE_ID_URL + id;
         final TAG REQUEST_TAG= TAG.getRouteID;
         JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.GET, requestUrl, null, new Response.Listener<JSONObject>(){
@@ -126,10 +133,10 @@ public class AtApiManager {
                 JSONArray dataArray;
                 try {
                     dataArray = response.getJSONArray("response");
-//                    ArrivalsActivity.responseHandler.onSuccess(TAG.getArrivals, dataArray);
+//                    ArrivalsActivity.ResponseHandler.onSuccess(TAG.getArrivals, dataArray);
                     responseHandlerForAdapter.onSuccess(REQUEST_TAG, dataArray);
                 } catch (JSONException e) {
-//                    ArrivalsActivity.responseHandler.onFailure(AtApiManager.TAG.getStop, id);
+//                    ArrivalsActivity.ResponseHandler.onFailure(AtApiManager.TAG.getStop, id);
                     // todo handle failure
                 }catch (Exception e){
                     e.printStackTrace();
@@ -161,10 +168,11 @@ public class AtApiManager {
                 JSONArray dataArray;
                 try {
                     dataArray = response.getJSONArray("response");
-//                    ArrivalsActivity.responseHandler.onSuccess(TAG.getArrivals, dataArray);
+//                    ArrivalsActivity.ResponseHandler.onSuccess(TAG.getArrivals, dataArray);
                     responseHandlerForAdapter.onSuccess(REQUEST_TAG, dataArray);
                 } catch (JSONException e) {
-//                    ArrivalsActivity.responseHandler.onFailure(AtApiManager.TAG.getStop, id);
+//                    ArrivalsActivity.ResponseHandler.onFailure(AtApiManager.TAG.getStop, id);
+                    System.out.print("something"); //todo remove
                     // todo handle failure
                 }catch (Exception e){
                     e.printStackTrace();
@@ -172,7 +180,9 @@ public class AtApiManager {
             }
         }, new Response.ErrorListener() {
             @Override
-            public void onErrorResponse(VolleyError error) {}
+            public void onErrorResponse(VolleyError error) {
+                System.out.print("something"); //todo remove
+            }
         }){
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError{

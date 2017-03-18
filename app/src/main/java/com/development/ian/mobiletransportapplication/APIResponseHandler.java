@@ -4,9 +4,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.support.design.widget.Snackbar;
 import android.view.View;
-import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.TextView;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -20,7 +18,7 @@ import java.util.Comparator;
  * Created by Ian on 3/1/2017.
  */
 
-public class APIResponseHandler implements responseHandler {
+public class APIResponseHandler implements ResponseHandler {
 
     private View view;
     private ListView list;
@@ -30,14 +28,16 @@ public class APIResponseHandler implements responseHandler {
 
     private AtApiManager APIAccess = AtApiManager.getInstance();
 
-    private StationProvider stationProvider = new StationProvider();
+    private StationProvider stationProvider = new StationProvider();//todo remove
+
+    private SavedStopProvider savedStopProvider;
+    private StopProvider stopProvider;
 
     public APIResponseHandler(View view){
         this.view = view;
     }
 
-    public APIResponseHandler(View view, BusArrival busArrival){
-        this.view = view;
+    public APIResponseHandler(BusArrival busArrival){
         this.busArrival = busArrival;
     }
 
@@ -49,22 +49,46 @@ public class APIResponseHandler implements responseHandler {
 
 
     @Override
-    public void onSuccess(AtApiManager.TAG tag, JSONArray dataArray) {
+    public void onSuccess(AtApiManager.TAG tag, JSONArray dataArray) throws JSONException { //todo handle exception rather than throwing
         if(tag == AtApiManager.TAG.getStop){
             try {
-                JSONObject dataObject = dataArray.getJSONObject(0);
-                ContentValues values = new ContentValues();
-                values.put(DBHelper.STOPS_ID, dataObject.getString("stop_id"));
-                values.put(DBHelper.STOPS_NAME, dataObject.getString("stop_name"));
-                values.put(DBHelper.STOPS_LAT, Double.parseDouble(dataObject.getString("stop_lat")));
-                values.put(DBHelper.STOPS_LON, Double.parseDouble(dataObject.getString("stop_lon")));
-                stationProvider.insert(StationProvider.CONTENT_URI, values);
-                AddNewStopActivity.restoreUserControl();
-                Snackbar.make(view, "Stop " + values.get(DBHelper.STOPS_ID) + " has been added", Snackbar.LENGTH_SHORT).show();
-            }catch (JSONException jEx){
 
-            }finally {
-                return;
+                //old
+                JSONObject dataObject = dataArray.getJSONObject(0);
+                ContentValues stopsValues = new ContentValues();
+                stopsValues.put(DBHelper.STOPS_ID, dataObject.getString("stop_id"));
+                stopsValues.put(DBHelper.STOPS_NAME, dataObject.getString("stop_name"));
+                stopsValues.put(DBHelper.STOPS_LAT, Double.parseDouble(dataObject.getString("stop_lat")));
+                stopsValues.put(DBHelper.STOPS_LON, Double.parseDouble(dataObject.getString("stop_lon")));
+                stationProvider.insert(StationProvider.CONTENT_URI, stopsValues);
+                AddNewStopActivity.restoreUserControl();
+                Snackbar.make(view, "Stop " + stopsValues.get(DBHelper.STOPS_ID) + " has been added", Snackbar.LENGTH_SHORT).show();
+                //end old
+
+                //add to saved stops
+                if(savedStopProvider==null){
+                    savedStopProvider = new SavedStopProvider();
+                }
+                ContentValues savedStopValues = new ContentValues();
+                savedStopValues.put(DBHelper.SAVED_STOP_ID, dataObject.getInt(DBHelper.SAVED_STOP_ID));
+                savedStopProvider.insert(SavedStopProvider.CONTENT_URI, savedStopValues);
+
+                //add to stops
+                if(stopProvider==null){
+                    stopProvider = new StopProvider();
+                }
+                ContentValues stopValues = new ContentValues();
+                stopsValues.put(DBHelper.STOP_NAME, dataObject.getString(DBHelper.STOP_NAME));
+                stopsValues.put(DBHelper.STOP_ID, dataObject.getInt(DBHelper.STOP_ID));
+                stopsValues.put(DBHelper.STOP_LAT, dataObject.getDouble(DBHelper.STOP_LAT));
+                stopsValues.put(DBHelper.STOP_LON, dataObject.getDouble(DBHelper.STOP_LON));
+                stopsValues.put(DBHelper.STOP_CODE, dataObject.getInt(DBHelper.STOP_CODE));
+                stopsValues.put(DBHelper.STOP_PARENT, dataObject.getInt(DBHelper.STOP_PARENT));
+                stopProvider.insert(StopProvider.CONTENT_URI, stopsValues);
+
+
+            }catch (JSONException e){
+                throw e;
             }
         }
         else if(tag == AtApiManager.TAG.getArrivals){
@@ -84,7 +108,7 @@ public class APIResponseHandler implements responseHandler {
                 ArrivalAdapter adapter = new ArrivalAdapter(context, R.layout.arrival_list_item, arrivalList);
                 list.setAdapter(adapter);
             }catch (JSONException e){
-
+                throw e;
             }
         }
         else if(tag == AtApiManager.TAG.getRouteID){
@@ -100,11 +124,11 @@ public class APIResponseHandler implements responseHandler {
             try {
                 JSONObject dataObject = dataArray.getJSONObject(0);
                 String routeName = dataObject.getString("route_short_name");
-                TextView textView = (TextView) view;
-                textView.setText(routeName);
+//                TextView textView = (TextView) view;
+//                textView.setText(routeName);
                 busArrival.setRoute(routeName);
             }catch (JSONException e){
-
+                throw e;
             }
         }
     }

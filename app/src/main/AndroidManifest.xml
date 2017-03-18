@@ -35,6 +35,16 @@
             android:authorities="com.example.ian.MobileTransportApplication.StationProvider"
             android:exported="false"/>
 
+        <provider
+            android:name=".SavedStopProvider"
+            android:authorities="com.example.ian.MobileTransportApplication.SavedStopProvider"
+            android:exported="false"/>
+
+        <provider
+            android:name=".StopProvider"
+            android:authorities="com.example.ian.MobileTransportApplication.StopProvider"
+            android:exported="false"/>
+
         <activity
             android:name=".ArrivalsActivity"
             android:label="@string/title_activity_arrivals"

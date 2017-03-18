@@ -22,6 +22,10 @@ public class ArrivalAdapter extends ArrayAdapter<BusArrival> {
     private AtApiManager APIAccess = AtApiManager.getInstance();
     public APIResponseHandler responseHandler;
 
+    int position;
+    View convertView;
+    ViewGroup parent;
+
 
     public ArrivalAdapter(Context context, int resource, List<BusArrival> objects) {
         super(context, resource, objects);
@@ -31,21 +35,26 @@ public class ArrivalAdapter extends ArrayAdapter<BusArrival> {
 
 
     public View getView(int position, View convertView, ViewGroup parent) {
+        this.position = position;
+        this.convertView = convertView;
+        this.parent = parent;
         View v = convertView;
         if (v == null) {
             LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             v = inflater.inflate(R.layout.arrival_list_item, null);
         }
         BusArrival busArrival = arrivals.get(position);
+//        busArrival.setArrivalAdapter(this);
         TextView route = (TextView) v.findViewById(R.id.routeNum);
         TextView time = (TextView) v.findViewById(R.id.arrivalTime);
 //        route.setText(busArrival.getRouteNum());
         route.setText(busArrival.getRoute());
         time.setText(busArrival.getArrivalTime());
-        if(busArrival.getRoute() == BusArrival.PLACE_HOLDER) {
-            responseHandler = new APIResponseHandler(route, busArrival);
-            APIAccess.getRouteId(busArrival.getTripId(), responseHandler, context.getApplicationContext());
-        }
+        busArrival.setRouteTextView(route);
+//        if(busArrival.getRoute() == BusArrival.PLACE_HOLDER) {
+//            ResponseHandler = new APIResponseHandler(route, busArrival);
+//            APIAccess.getRouteId(busArrival.getTripId(), ResponseHandler, context.getApplicationContext());
+//        }
         return v;
     }
 }
