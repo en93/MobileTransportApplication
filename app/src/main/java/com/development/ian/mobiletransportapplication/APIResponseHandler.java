@@ -198,6 +198,7 @@ public class APIResponseHandler implements ResponseHandler {
             calenderValues.put(DBHelper.CALENDER_SUNDAY, dataObject.getInt(DBHelper.CALENDER_SUNDAY));
             calenderValues.put(DBHelper.CALENDER_START, dataObject.getString(DBHelper.CALENDER_START));
             calenderValues.put(DBHelper.CALENDER_END, dataObject.getString(DBHelper.CALENDER_END));
+            calenderProvider.insert(CalenderProvider.CONTENT_URI, calenderValues);
         }
     } //todo place inside of iterator just incase there is a case where multiple calanders are returned
 
