@@ -30,8 +30,8 @@ public class BusArrival {
         this.tripId = tripId;
         this.route = PLACE_HOLDER;
 
-        responseHandler = new APIResponseHandler(this);
-        APIAccess.getRouteId(this.tripId, responseHandler); //todo doesnt retreive before its displayed
+//        responseHandler = new APIResponseHandler(this, );
+//        APIAccess.getRoute(this.tripId, responseHandler); //todo doesnt retreive before its displayed
     }
 
     public String getArrivalTime() {

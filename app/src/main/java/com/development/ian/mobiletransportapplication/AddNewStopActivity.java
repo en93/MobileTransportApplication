@@ -36,7 +36,7 @@ public class AddNewStopActivity extends AppCompatActivity {
         final Button addSample = (Button) findViewById(R.id.addSample);
         final EditText editIdText = (EditText) findViewById(R.id.editIdText);
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
-        responseHandler = new APIResponseHandler(findViewById(R.id.add_new_layout));
+        responseHandler = new APIResponseHandler(findViewById(R.id.add_new_layout), getApplicationContext());
         addStop.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v){

@@ -53,7 +53,7 @@ public class ArrivalAdapter extends ArrayAdapter<BusArrival> {
         busArrival.setRouteTextView(route);
 //        if(busArrival.getRoute() == BusArrival.PLACE_HOLDER) {
 //            ResponseHandler = new APIResponseHandler(route, busArrival);
-//            APIAccess.getRouteId(busArrival.getTripId(), ResponseHandler, context.getApplicationContext());
+//            APIAccess.getRoute(busArrival.getTripId(), ResponseHandler, context.getApplicationContext());
 //        }
         return v;
     }

@@ -29,8 +29,10 @@ public class AtApiManager {
 
     public static final String REQUEST_STOP_URL = "https://api.at.govt.nz/v2/gtfs/stops/stopId/";
     public static final String REQUEST_Arrival_TIMES_URL = "https://api.at.govt.nz/v2/gtfs/stopTimes/stopId/";
-    public static final String REQUEST_ROUTE_ID_URL = "https://api.at.govt.nz/v2/gtfs/trips/tripId/";
-    public static final String REQUEST_ROUTE_NAME_URL = "https://api.at.govt.nz/v2/gtfs/routes/routeId/";
+    public static final String REQUEST_ROUTE_URL = "https://api.at.govt.nz/v2/gtfs/routes/routeId/";
+    public static final String REQUEST_TRIP_URL = "https://api.at.govt.nz/v2/gtfs/trips/tripId/";
+    public static final String REQUEST_CALENDER_URL = "https://api.at.govt.nz/v2/gtfs/calendar/serviceId/";
+
     private static AtApiManager APIAccess = new AtApiManager();
 
     private final String SUBKEYLABEL = "Ocp-Apim-Subscription-Key";
@@ -47,6 +49,7 @@ public class AtApiManager {
     public void GetStopById(final String id, final Context context, final APIResponseHandler responseHandler){
         ConfirmQueueRunning(context);
         String requestUrl = REQUEST_STOP_URL + id;
+        final TAG REQUEST_TAG= TAG.getStop;
         JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.GET, requestUrl, null, new Response.Listener<JSONObject>(){
 
            @Override
@@ -54,9 +57,9 @@ public class AtApiManager {
                JSONArray dataArray;
                try {
                    dataArray = response.getJSONArray("response");
-                   responseHandler.onSuccess(AtApiManager.TAG.getStop, dataArray);
+                   responseHandler.onSuccess(REQUEST_TAG, dataArray);
                } catch (JSONException e) {
-                   responseHandler.onFailure(AtApiManager.TAG.getStop, id);
+                   responseHandler.onFailure(REQUEST_TAG, id);
                }catch (Exception e){
                    e.printStackTrace();
                }
@@ -75,13 +78,14 @@ public class AtApiManager {
             }
 
         };
-        jsonRequest.setTag(TAG.getStop);
+        jsonRequest.setTag(REQUEST_TAG);
         requestQueue.add(jsonRequest);
     }
 
-    public void getArrivalTimes(final String id, Context context){
+    public void getArrivalTimes(final String id, Context context, final APIResponseHandler responseHandler){
         ConfirmQueueRunning(context);
         String requestUrl = REQUEST_Arrival_TIMES_URL  + id;
+        final TAG REQUEST_TAG= TAG.getArrivals;
         JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.GET, requestUrl, null, new Response.Listener<JSONObject>(){
 
             @Override
@@ -90,9 +94,9 @@ public class AtApiManager {
 
                 try {
                     dataArray = response.getJSONArray("response");
-                    ArrivalsActivity.responseHandler.onSuccess(TAG.getArrivals, dataArray);
+                    responseHandler.onSuccess(REQUEST_TAG, dataArray);
                 } catch (JSONException e) {
-                    ArrivalsActivity.responseHandler.onFailure(AtApiManager.TAG.getStop, id);
+                    responseHandler.onFailure(REQUEST_TAG, id);
                 }catch (Exception e){
                     e.printStackTrace();
                 }
@@ -108,7 +112,41 @@ public class AtApiManager {
                     return headers;
                 }
             };
-        jsonRequest.setTag(TAG.getArrivals);
+        jsonRequest.setTag(REQUEST_TAG);
+        requestQueue.add(jsonRequest);
+    }
+
+    public void getTrip(final String id, Context context, final APIResponseHandler responseHandler){
+        ConfirmQueueRunning(context);
+        String requestUrl = REQUEST_TRIP_URL  + id;
+        final TAG REQUEST_TAG= TAG.getTrip;
+        JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.GET, requestUrl, null, new Response.Listener<JSONObject>(){
+
+            @Override
+            public void onResponse(JSONObject response){
+                JSONArray dataArray;
+
+                try {
+                    dataArray = response.getJSONArray("response");
+                    responseHandler.onSuccess(REQUEST_TAG, dataArray);
+                } catch (JSONException e) {
+                    responseHandler.onFailure(REQUEST_TAG, id);
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {}
+        }){
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError{
+                Map<String, String> headers = new HashMap<String, String>();
+                headers.put(SUBKEYLABEL, KEY);
+                return headers;
+            }
+        };
+        jsonRequest.setTag(REQUEST_TAG);
         requestQueue.add(jsonRequest);
     }
 
@@ -123,10 +161,10 @@ public class AtApiManager {
         ConfirmQueueRunning(this.context);
     }
 
-    public void getRouteId(final String id, final APIResponseHandler responseHandlerForAdapter){
+    public void getRoute(final String id, final APIResponseHandler responseHandler){
         ConfirmQueueRunning();
-        String requestUrl = REQUEST_ROUTE_ID_URL + id;
-        final TAG REQUEST_TAG= TAG.getRouteID;
+        String requestUrl = REQUEST_ROUTE_URL + id;
+        final TAG REQUEST_TAG= TAG.getRoute;
         JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.GET, requestUrl, null, new Response.Listener<JSONObject>(){
 
             @Override
@@ -135,9 +173,9 @@ public class AtApiManager {
                 try {
                     dataArray = response.getJSONArray("response");
 //                    ArrivalsActivity.ResponseHandler.onSuccess(TAG.getArrivals, dataArray);
-                    responseHandlerForAdapter.onSuccess(REQUEST_TAG, dataArray);
+                    responseHandler.onSuccess(REQUEST_TAG, dataArray);
                 } catch (JSONException e) {
-//                    ArrivalsActivity.ResponseHandler.onFailure(AtApiManager.TAG.getStop, id);
+                    responseHandler.onFailure(REQUEST_TAG, id);
                     // todo handle failure
                 }catch (Exception e){
                     e.printStackTrace();
@@ -158,10 +196,10 @@ public class AtApiManager {
         requestQueue.add(jsonRequest);
     }
 
-    public void getRouteName(final String id, final APIResponseHandler responseHandlerForAdapter, Context context){
-        ConfirmQueueRunning(context);
-        String requestUrl = REQUEST_ROUTE_NAME_URL + id;
-        final TAG REQUEST_TAG= TAG.getRouteName;
+    public void getCalender(final String id, final APIResponseHandler responseHandler){
+        ConfirmQueueRunning();
+        String requestUrl = REQUEST_CALENDER_URL + id;
+        final TAG REQUEST_TAG= TAG.getCalender;
         JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.GET, requestUrl, null, new Response.Listener<JSONObject>(){
 
             @Override
@@ -169,11 +207,9 @@ public class AtApiManager {
                 JSONArray dataArray;
                 try {
                     dataArray = response.getJSONArray("response");
-//                    ArrivalsActivity.ResponseHandler.onSuccess(TAG.getArrivals, dataArray);
-                    responseHandlerForAdapter.onSuccess(REQUEST_TAG, dataArray);
+                    responseHandler.onSuccess(REQUEST_TAG, dataArray);
                 } catch (JSONException e) {
-//                    ArrivalsActivity.ResponseHandler.onFailure(AtApiManager.TAG.getStop, id);
-                    System.out.print("something"); //todo remove
+                    responseHandler.onFailure(REQUEST_TAG, id);
                     // todo handle failure
                 }catch (Exception e){
                     e.printStackTrace();
@@ -181,9 +217,7 @@ public class AtApiManager {
             }
         }, new Response.ErrorListener() {
             @Override
-            public void onErrorResponse(VolleyError error) {
-                System.out.print("something"); //todo remove
-            }
+            public void onErrorResponse(VolleyError error) {}
         }){
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError{
@@ -195,6 +229,44 @@ public class AtApiManager {
         jsonRequest.setTag(REQUEST_TAG);
         requestQueue.add(jsonRequest);
     }
+
+//    public void getRouteName(final String id, final APIResponseHandler responseHandlerForAdapter, Context context){
+//        ConfirmQueueRunning(context);
+//        String requestUrl = REQUEST_ROUTE_NAME_URL + id;
+//        final TAG REQUEST_TAG= TAG.getRouteName;
+//        JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.GET, requestUrl, null, new Response.Listener<JSONObject>(){
+//
+//            @Override
+//            public void onResponse(JSONObject response){
+//                JSONArray dataArray;
+//                try {
+//                    dataArray = response.getJSONArray("response");
+////                    ArrivalsActivity.ResponseHandler.onSuccess(TAG.getArrivals, dataArray);
+//                    responseHandlerForAdapter.onSuccess(REQUEST_TAG, dataArray);
+//                } catch (JSONException e) {
+////                    ArrivalsActivity.ResponseHandler.onFailure(AtApiManager.TAG.getStop, id);
+//                    System.out.print("something"); //todo remove
+//                    // todo handle failure
+//                }catch (Exception e){
+//                    e.printStackTrace();
+//                }
+//            }
+//        }, new Response.ErrorListener() {
+//            @Override
+//            public void onErrorResponse(VolleyError error) {
+//                System.out.print("something"); //todo remove
+//            }
+//        }){
+//            @Override
+//            public Map<String, String> getHeaders() throws AuthFailureError{
+//                Map<String, String> headers = new HashMap<String, String>();
+//                headers.put(SUBKEYLABEL, KEY);
+//                return headers;
+//            }
+//        };
+//        jsonRequest.setTag(REQUEST_TAG);
+//        requestQueue.add(jsonRequest);
+//    }
 
     private void StartRequestQueue(Context context) {
         cache = new DiskBasedCache(context.getCacheDir(), 1024 * 1024);
@@ -215,12 +287,14 @@ public class AtApiManager {
             if(requestQueue!=null) {
                 requestQueue.cancelAll(TAG.getStop);
                 requestQueue.cancelAll(TAG.getArrivals);
-                requestQueue.cancelAll(TAG.getRouteID);
-                requestQueue.cancelAll(TAG.getRouteName);
+                requestQueue.cancelAll(TAG.getRoute);
+                requestQueue.cancelAll(TAG.getCalender);
+                requestQueue.cancelAll(TAG.getVersion);
+                requestQueue.cancelAll(TAG.getTrip);
             }
         }catch (Exception e){}
     }
 
-    public enum TAG{getStop, getArrivals, getRouteID, getRouteName}
+    public enum TAG{getStop, getArrivals, getRoute, getCalender, getVersion, getTrip}
 }
 

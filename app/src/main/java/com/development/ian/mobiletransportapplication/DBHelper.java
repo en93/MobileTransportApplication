@@ -13,7 +13,7 @@ public class DBHelper extends SQLiteOpenHelper {
     private static DBHelper instance;
 
     final static private String DATABASE_NAME ="AucklandTransport.db";
-    final static private int DATBASE_VERSION = 4;
+    final static private int DATBASE_VERSION = 7;
 
     //todo delete and replace with method that takes all busstop variables
     public static final String STOPS_TABLE = "stops";
@@ -49,18 +49,19 @@ public class DBHelper extends SQLiteOpenHelper {
     public static final String[] ARRIVAL_COLUMNS = {ARRIVAL_STOP_ID, ARRIVAL_TRIP_ID, ARRIVAL_TIME, ARRIVAL_TIME_SECONDS};
     public static final String ARRIVAL_CREATE = "CREATE TABLE " + ARRIVAL_TABLE + "(" + ARRIVAL_STOP_ID
             + " Integer, " + ARRIVAL_TRIP_ID + " VARCHAR(255), " + ARRIVAL_TIME + " VARCHAR(255), "
-            + ARRIVAL_TIME_SECONDS + " INTEGER)";
+            + ARRIVAL_TIME_SECONDS + " INTEGER, PRIMARY KEY (" + ARRIVAL_STOP_ID+", " + ARRIVAL_TRIP_ID+"))";
 
     //For setting up table of trip values
     public static final String TRIP_TABLE = "trip";
     public static final String TRIP_ROUTE_ID = "route_id";
+    public static final String TRIP_SERVICE_ID = "service_id";
     public static final String TRIP_ID = "trip_id";
     public static final String TRIP_HEADSIGN = "trip_headsign";
-    public static final String TRIP_Direction =  "direction_id";
-    public static final String[] TRIP_COLUMNS = {TRIP_ROUTE_ID, TRIP_ID, TRIP_HEADSIGN, TRIP_Direction};
+    public static final String TRIP_DIRECTION =  "direction_id";
+    public static final String[] TRIP_COLUMNS = {TRIP_ROUTE_ID, TRIP_SERVICE_ID, TRIP_ID, TRIP_HEADSIGN, TRIP_DIRECTION};
     public static final String TRIP_CREATE = " CREATE TABLE " + TRIP_TABLE + "(" + TRIP_ROUTE_ID
-            + " VARCHAR(255), " + TRIP_ID + " VARCHAR(255) PRIMARY KEY, " + TRIP_HEADSIGN
-            + " VARCHAR(255), " + TRIP_Direction + " INTEGER)";
+            + " VARCHAR(255), " + TRIP_SERVICE_ID + " VARCHAR(255), " + TRIP_ID + " VARCHAR(255) PRIMARY KEY, " + TRIP_HEADSIGN
+            + " VARCHAR(255), " + TRIP_DIRECTION + " INTEGER)";
 
     //For setting up table of route values
     public static final String ROUTE_TABLE = "route_table";
