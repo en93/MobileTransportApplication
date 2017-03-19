@@ -13,7 +13,7 @@ public class DBHelper extends SQLiteOpenHelper {
     private static DBHelper instance;
 
     final static private String DATABASE_NAME ="AucklandTransport.db";
-    final static private int DATBASE_VERSION = 3;
+    final static private int DATBASE_VERSION = 4;
 
     //todo delete and replace with method that takes all busstop variables
     public static final String STOPS_TABLE = "stops";
@@ -93,7 +93,7 @@ public class DBHelper extends SQLiteOpenHelper {
             + CALENDER__TUESDAY + " INTEGER, " + CALENDER_WEDNESDAY+ " INTEGER, "
             + CALENDER_THURSDAY+ " INTEGER, " + CALENDER_FRIDAY+ " INTEGER, "
             + CALENDER_SATURDAY+ " INTEGER, " + CALENDER_SUNDAY+ " INTEGER, "
-            + CALENDER_START + " VARCHAR(255), " + CALENDER_END + " VARCHAR(255))";
+            + CALENDER_START + " VARCHAR(255), " + CALENDER_END + " VARCHAR(255))"; //todo use compouund primary key instead
 
     //For setting up version table
     public static final String VERSION_TABLE = "version_table";
@@ -107,7 +107,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
     //For maintaining saved stations
     public static final String SAVED_STOP_TABLE = "saved_stops_table";
-    public static final String SAVED_STOP_ID = "saved_stop_id";
+    public static final String SAVED_STOP_ID = "stop_id";
     public static final String[] SAVED_COLUMNS = {SAVED_STOP_ID};
     public static final String SAVED_STOP_CREATE = "CREATE TABLE " + SAVED_STOP_TABLE + "("
             + SAVED_STOP_ID + " INTEGER PRIMARY KEY)";

@@ -21,9 +21,11 @@ public class AddNewStopActivity extends AppCompatActivity {
 
     public static APIResponseHandler responseHandler;
 
+    //TODO saying stop is invalid but is still adding successfully?
+
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) { //todo pressing the tick on the android keyboard should have the same behaviour as pressing 'Add Station'
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);                 //todo if a stop already has a matching primary key replace it with the new stop
         setContentView(R.layout.activity_add_new_stop);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);

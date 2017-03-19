@@ -31,18 +31,43 @@
         </activity>
 
         <provider
-            android:name=".StationProvider"
+            android:name=".TransportContentProviders.StationProvider"
             android:authorities="com.example.ian.MobileTransportApplication.StationProvider"
             android:exported="false"/>
 
         <provider
-            android:name=".SavedStopProvider"
+            android:name=".TransportContentProviders.SavedStopProvider"
             android:authorities="com.example.ian.MobileTransportApplication.SavedStopProvider"
             android:exported="false"/>
 
         <provider
-            android:name=".StopProvider"
+            android:name=".TransportContentProviders.StopProvider"
             android:authorities="com.example.ian.MobileTransportApplication.StopProvider"
+            android:exported="false"/>
+
+        <provider
+            android:name=".TransportContentProviders.ArrivalProvider"
+            android:authorities="com.example.ian.MobileTransportApplication.ArrivalProvider"
+            android:exported="false"/>
+
+        <provider
+            android:name=".TransportContentProviders.TripProvider"
+            android:authorities="com.example.ian.MobileTransportApplication.TripProvider"
+            android:exported="false"/>
+
+        <provider
+            android:name=".TransportContentProviders.RouteProvider"
+            android:authorities="com.example.ian.MobileTransportApplication.RouteProvider"
+            android:exported="false"/>
+
+        <provider
+            android:name=".TransportContentProviders.CalenderProvider"
+            android:authorities="com.example.ian.MobileTransportApplication.CalenderProvider"
+            android:exported="false"/>
+
+        <provider
+            android:name=".TransportContentProviders.VersionProvider"
+            android:authorities="com.example.ian.MobileTransportApplication.VersionProvider"
             android:exported="false"/>
 
         <activity

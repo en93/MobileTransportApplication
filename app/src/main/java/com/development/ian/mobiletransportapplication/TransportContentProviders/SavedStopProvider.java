@@ -1,4 +1,4 @@
-package com.development.ian.mobiletransportapplication;
+package com.development.ian.mobiletransportapplication.TransportContentProviders;
 
 import android.content.ContentProvider;
 import android.content.ContentValues;
@@ -7,6 +7,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+
+import com.development.ian.mobiletransportapplication.DBHelper;
 
 /**
  * Created by Ian on 3/18/2017.

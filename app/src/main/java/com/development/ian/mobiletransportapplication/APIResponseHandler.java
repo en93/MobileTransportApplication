@@ -6,6 +6,10 @@ import android.support.design.widget.Snackbar;
 import android.view.View;
 import android.widget.ListView;
 
+import com.development.ian.mobiletransportapplication.TransportContentProviders.SavedStopProvider;
+import com.development.ian.mobiletransportapplication.TransportContentProviders.StationProvider;
+import com.development.ian.mobiletransportapplication.TransportContentProviders.StopProvider;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -117,7 +121,7 @@ public class APIResponseHandler implements ResponseHandler {
                 String routeID = dataObject.getString("route_id");
                 APIAccess.getRouteName(routeID, this, context );
             }catch (JSONException e){
-
+                throw e;
             }
         }
         else if(tag == AtApiManager.TAG.getRouteName){
