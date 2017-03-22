@@ -10,7 +10,9 @@ import com.android.volley.toolbox.BasicNetwork;
 import com.android.volley.toolbox.DiskBasedCache;
 import com.android.volley.toolbox.HurlStack;
 import com.android.volley.toolbox.JsonObjectRequest;
-import com.development.ian.mobiletransportapplication.TransportContentProviders.StationProvider;
+import com.development.ian.mobiletransportapplication.TransportContentProviders.ArrivalProvider;
+import com.development.ian.mobiletransportapplication.TransportContentProviders.TripProvider;
+//import com.development.ian.mobiletransportapplication.TransportContentProviders.StationProvider;
 
 import android.content.Context;
 
@@ -37,7 +39,7 @@ public class AtApiManager {
 
     private final String SUBKEYLABEL = "Ocp-Apim-Subscription-Key";
     private final String KEY = "c9c8bfee133f4646a9c92c7dcb7229a9";
-    private StationProvider stationProvider= new StationProvider();
+//    private StationProvider stationProvider= new StationProvider();
 
     static Cache cache;
     static Network network;
@@ -47,6 +49,7 @@ public class AtApiManager {
 
 
     public void GetStopById(final String id, final Context context, final APIResponseHandler responseHandler){
+        final Request.Priority PRIORITY = Request.Priority.HIGH;
         ConfirmQueueRunning(context);
         String requestUrl = REQUEST_STOP_URL + id;
         final TAG REQUEST_TAG= TAG.getStop;
@@ -59,7 +62,7 @@ public class AtApiManager {
                    dataArray = response.getJSONArray("response");
                    responseHandler.onSuccess(REQUEST_TAG, dataArray);
                } catch (JSONException e) {
-                   responseHandler.onFailure(REQUEST_TAG, id);
+                   responseHandler.onFailure(REQUEST_TAG, id, e);
                }catch (Exception e){
                    e.printStackTrace();
                }
@@ -76,6 +79,11 @@ public class AtApiManager {
                 headers.put(SUBKEYLABEL, KEY);
                 return headers;
             }
+            @Override
+            public Request.Priority getPriority() {
+                return PRIORITY;
+            }
+
 
         };
         jsonRequest.setTag(REQUEST_TAG);
@@ -83,6 +91,9 @@ public class AtApiManager {
     }
 
     public void getArrivalTimes(final String id, Context context, final APIResponseHandler responseHandler){
+
+        ArrivalProvider.requestedButNotCompleted.add(Integer.parseInt(id)); //todo investage if there will be concurency issues
+
         ConfirmQueueRunning(context);
         String requestUrl = REQUEST_Arrival_TIMES_URL  + id;
         final TAG REQUEST_TAG= TAG.getArrivals;
@@ -96,9 +107,9 @@ public class AtApiManager {
                     dataArray = response.getJSONArray("response");
                     responseHandler.onSuccess(REQUEST_TAG, dataArray);
                 } catch (JSONException e) {
-                    responseHandler.onFailure(REQUEST_TAG, id);
-                }catch (Exception e){
-                    e.printStackTrace();
+                    responseHandler.onFailure(REQUEST_TAG, id, e);
+                } finally {
+                    ArrivalProvider.requestedButNotCompleted.remove(new Integer(Integer.parseInt(id)));
                 }
             }
         }, new Response.ErrorListener() {
@@ -117,6 +128,9 @@ public class AtApiManager {
     }
 
     public void getTrip(final String id, Context context, final APIResponseHandler responseHandler){
+
+        TripProvider.requestedButNotCompleted.add(id);
+
         ConfirmQueueRunning(context);
         String requestUrl = REQUEST_TRIP_URL  + id;
         final TAG REQUEST_TAG= TAG.getTrip;
@@ -130,10 +144,12 @@ public class AtApiManager {
                     dataArray = response.getJSONArray("response");
                     responseHandler.onSuccess(REQUEST_TAG, dataArray);
                 } catch (JSONException e) {
-                    responseHandler.onFailure(REQUEST_TAG, id);
+                    responseHandler.onFailure(REQUEST_TAG, id, e);
                 }catch (Exception e){
                     e.printStackTrace();
-                }
+                }finally {
+                    TripProvider.requestedButNotCompleted.remove(id); // todo test this!
+                } //todo handle failure better
             }
         }, new Response.ErrorListener() {
             @Override
@@ -175,7 +191,7 @@ public class AtApiManager {
 //                    ArrivalsActivity.ResponseHandler.onSuccess(TAG.getArrivals, dataArray);
                     responseHandler.onSuccess(REQUEST_TAG, dataArray);
                 } catch (JSONException e) {
-                    responseHandler.onFailure(REQUEST_TAG, id);
+                    responseHandler.onFailure(REQUEST_TAG, id, e);
                     // todo handle failure
                 }catch (Exception e){
                     e.printStackTrace();
@@ -209,7 +225,7 @@ public class AtApiManager {
                     dataArray = response.getJSONArray("response");
                     responseHandler.onSuccess(REQUEST_TAG, dataArray);
                 } catch (JSONException e) {
-                    responseHandler.onFailure(REQUEST_TAG, id);
+                    responseHandler.onFailure(REQUEST_TAG, id, e);
                     // todo handle failure
                 }catch (Exception e){
                     e.printStackTrace();
@@ -230,43 +246,7 @@ public class AtApiManager {
         requestQueue.add(jsonRequest);
     }
 
-//    public void getRouteName(final String id, final APIResponseHandler responseHandlerForAdapter, Context context){
-//        ConfirmQueueRunning(context);
-//        String requestUrl = REQUEST_ROUTE_NAME_URL + id;
-//        final TAG REQUEST_TAG= TAG.getRouteName;
-//        JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.GET, requestUrl, null, new Response.Listener<JSONObject>(){
-//
-//            @Override
-//            public void onResponse(JSONObject response){
-//                JSONArray dataArray;
-//                try {
-//                    dataArray = response.getJSONArray("response");
-////                    ArrivalsActivity.ResponseHandler.onSuccess(TAG.getArrivals, dataArray);
-//                    responseHandlerForAdapter.onSuccess(REQUEST_TAG, dataArray);
-//                } catch (JSONException e) {
-////                    ArrivalsActivity.ResponseHandler.onFailure(AtApiManager.TAG.getStop, id);
-//                    System.out.print("something"); //todo remove
-//                    // todo handle failure
-//                }catch (Exception e){
-//                    e.printStackTrace();
-//                }
-//            }
-//        }, new Response.ErrorListener() {
-//            @Override
-//            public void onErrorResponse(VolleyError error) {
-//                System.out.print("something"); //todo remove
-//            }
-//        }){
-//            @Override
-//            public Map<String, String> getHeaders() throws AuthFailureError{
-//                Map<String, String> headers = new HashMap<String, String>();
-//                headers.put(SUBKEYLABEL, KEY);
-//                return headers;
-//            }
-//        };
-//        jsonRequest.setTag(REQUEST_TAG);
-//        requestQueue.add(jsonRequest);
-//    }
+
 
     private void StartRequestQueue(Context context) {
         cache = new DiskBasedCache(context.getCacheDir(), 1024 * 1024);
@@ -282,15 +262,10 @@ public class AtApiManager {
         return APIAccess;
     }
 
-    public static void CancelRequests(){
+    public static void CancelStopRequests(){
         try {
             if(requestQueue!=null) {
                 requestQueue.cancelAll(TAG.getStop);
-                requestQueue.cancelAll(TAG.getArrivals);
-                requestQueue.cancelAll(TAG.getRoute);
-                requestQueue.cancelAll(TAG.getCalender);
-                requestQueue.cancelAll(TAG.getVersion);
-                requestQueue.cancelAll(TAG.getTrip);
             }
         }catch (Exception e){}
     }

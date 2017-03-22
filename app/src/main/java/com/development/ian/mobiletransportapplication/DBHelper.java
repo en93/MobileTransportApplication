@@ -15,22 +15,22 @@ public class DBHelper extends SQLiteOpenHelper {
     final static private String DATABASE_NAME ="AucklandTransport.db";
     final static private int DATBASE_VERSION = 9;
 
-    //todo delete and replace with method that takes all busstop variables
-    public static final String STOPS_TABLE = "stops";
-    public static final String STOPS_ID = "_id";
-    public static final String STOPS_LAT = "lat";
-    public static final String STOPS_LON = "long";
-    public static final String STOPS_NAME = "name";
-    public static final String[] STOPS_COLUMNS = {STOPS_ID, STOPS_NAME, STOPS_LAT, STOPS_LAT};
-    public static final String STOPS_CREATE = "CREATE TABLE "+ STOPS_TABLE + "(" + STOPS_ID + " INTEGER PRIMARY KEY, "
-            + STOPS_NAME + " varchar(255)," + STOPS_LAT+" float,"+STOPS_LON+" float)";
-    //todo end replacement area
+
+//    public static final String STOPS_TABLE = "stops";
+//    public static final String STOPS_ID = "_id";
+//    public static final String STOPS_LAT = "lat";
+//    public static final String STOPS_LON = "long";
+//    public static final String STOPS_NAME = "name";
+//    public static final String[] STOPS_COLUMNS = {STOPS_ID, STOPS_NAME, STOPS_LAT, STOPS_LAT};
+//    public static final String STOPS_CREATE = "CREATE TABLE "+ STOPS_TABLE + "(" + STOPS_ID + " INTEGER PRIMARY KEY, "
+//            + STOPS_NAME + " varchar(255)," + STOPS_LAT+" float,"+STOPS_LON+" float)";
+
 
 
     //For setting up table of bus stops
     public static final String STOP_TABLE= "stop";
     public static final String STOP_NAME = "stop_name";
-    public static final String STOP_ID = "stop_id";
+    public static final String STOP_ID = "_id";
     public static final String STOP_LAT = "stop_lat";
     public static final String STOP_LON = "stop_lon";
     public static final String STOP_CODE = "stop_code";
@@ -122,8 +122,6 @@ public class DBHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL(STOPS_CREATE); //todo remove
-
         db.execSQL(STOP_CREATE);
         db.execSQL(TRIP_CREATE);
         db.execSQL(ROUTE_CREATE);
@@ -137,7 +135,7 @@ public class DBHelper extends SQLiteOpenHelper {
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         //todo have clear all rather than specifying manually
 
-        db.execSQL("DROP TABLE IF EXISTS " + STOPS_TABLE); //todo remove from app
+        db.execSQL("DROP TABLE IF EXISTS " + "stops"); //todo remove from app
 
         db.execSQL("DROP TABLE IF EXISTS " + STOP_TABLE);
         db.execSQL("DROP TABLE IF EXISTS " + TRIP_TABLE);

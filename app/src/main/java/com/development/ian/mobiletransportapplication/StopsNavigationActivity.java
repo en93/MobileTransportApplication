@@ -17,14 +17,14 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.development.ian.mobiletransportapplication.TransportContentProviders.SavedStopProvider;
-import com.development.ian.mobiletransportapplication.TransportContentProviders.StationProvider;
+//import com.development.ian.mobiletransportapplication.TransportContentProviders.StationProvider;
 import com.development.ian.mobiletransportapplication.TransportContentProviders.StopProvider;
 
 
 public class StopsNavigationActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
     private CursorAdapter cAdapter;
-    private StationProvider stationProvider;
+//    private StationProvider stationProvider;
     private StopProvider stopProvider;
     private SavedStopProvider savedStopProvider;
 
@@ -38,6 +38,7 @@ public class StopsNavigationActivity extends AppCompatActivity implements Loader
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         ListView list = (ListView) findViewById(R.id.stopList);
+        stopProvider = new StopProvider();
         cAdapter = new StopsCursorAdapter(this, null, 0);
         list.setAdapter(cAdapter);
         getLoaderManager().initLoader(0,null,this);
@@ -62,28 +63,29 @@ public class StopsNavigationActivity extends AppCompatActivity implements Loader
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-        if (id == R.id.action_clear_data) {
-            if(stationProvider == null){
-                stationProvider = new StationProvider();
-            }
-            if(savedStopProvider== null){
-                savedStopProvider = new SavedStopProvider();
-            }
-            if(stopProvider == null){
-                stopProvider = new StopProvider();
-            }
-            stationProvider.delete(StationProvider.CONTENT_URI, null, null);
-            savedStopProvider.delete(StationProvider.CONTENT_URI, null, null);
-            stopProvider.delete(StationProvider.CONTENT_URI, null, null);
-            restartLoader();
-            return true;
+        if (id == R.id.action_clear_data) { //todo put new handling here
+//            if(stationProvider == null){
+//                stationProvider = new StationProvider();
+//            }
+//        if(savedStopProvider== null){
+//            savedStopProvider = new SavedStopProvider();
+//        }
+//        if(stopProvider == null){
+//            stopProvider = new StopProvider();
+//        }
+//        stationProvider.delete(StationProvider.CONTENT_URI, null, null);
+//        savedStopProvider.delete(StationProvider.CONTENT_URI, null, null);
+//        stopProvider.delete(StationProvider.CONTENT_URI, null, null);
+//        restartLoader();
+//        return true;
         }
         return super.onOptionsItemSelected(item);
     }
 
     @Override
     public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
-        return new CursorLoader(this, StationProvider.CONTENT_URI, null, null, null, null);
+//        return new CursorLoader(this, StationProvider.CONTENT_URI, null, null, null, null);
+        return new CursorLoader(this, StopProvider.CONTENT_URI, null, null, null, null);
     }
 
     @Override

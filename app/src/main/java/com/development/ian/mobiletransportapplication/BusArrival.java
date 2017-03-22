@@ -12,7 +12,7 @@ public class BusArrival {
     private String tripId;
     private int arrivalSeconds;
 
-//    private ArrivalAdapter arrivalAdapter; //todo remove does not work
+//    private ArrivalAdapter arrivalAdapter;
     private TextView routeTextV;
 
     public final static String PLACE_HOLDER = "...";
@@ -31,7 +31,7 @@ public class BusArrival {
         this.route = PLACE_HOLDER;
 
 //        responseHandler = new APIResponseHandler(this, );
-//        APIAccess.getRoute(this.tripId, responseHandler); //todo doesnt retreive before its displayed
+//        APIAccess.getRoute(this.tripId, responseHandler);
     }
 
     public String getArrivalTime() {

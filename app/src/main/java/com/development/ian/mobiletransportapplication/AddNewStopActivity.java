@@ -41,6 +41,7 @@ public class AddNewStopActivity extends AppCompatActivity {
             @Override
             public void onClick(View v){
                 RemoveUserControl();
+                //todo check there is not already the values in db
                 APIAccess.GetStopById(editIdText.getText().toString(), getApplicationContext(),responseHandler);
 
             }
@@ -68,7 +69,7 @@ public class AddNewStopActivity extends AppCompatActivity {
         window.clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
         if(progressBar.getVisibility()==View.VISIBLE){
             progressBar.setVisibility(View.GONE);
-            AtApiManager.CancelRequests();
+            AtApiManager.CancelStopRequests();
 
         }else {
             super.onBackPressed();
@@ -85,7 +86,7 @@ public class AddNewStopActivity extends AppCompatActivity {
 
     @Override
     public void onDestroy(){
-        AtApiManager.CancelRequests();
+        AtApiManager.CancelStopRequests();
         super.onDestroy();
     }
 

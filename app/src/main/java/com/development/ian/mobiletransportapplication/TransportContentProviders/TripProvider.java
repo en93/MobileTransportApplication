@@ -10,6 +10,8 @@ import android.support.annotation.Nullable;
 
 import com.development.ian.mobiletransportapplication.DBHelper;
 
+import java.util.ArrayList;
+
 /**
  * Created by Ian on 3/18/2017.
  */
@@ -21,6 +23,9 @@ public class TripProvider extends ContentProvider {
     public static final Uri CONTENT_URI = Uri.parse("content://" + AUTHORITY + "/" + BASE_PATH );
 
     private static SQLiteDatabase ATData;
+
+    public static ArrayList<String> requestedButNotCompleted = new ArrayList<String>();
+
 
 
     @Override
@@ -61,5 +66,20 @@ public class TripProvider extends ContentProvider {
     @Override
     public int update(@NonNull Uri uri, @Nullable ContentValues contentValues, @Nullable String s, @Nullable String[] strings) {
         return ATData.update(DBHelper.TRIP_TABLE, contentValues, s, strings);
+    }
+
+    public boolean containsKeyValue(String value) {
+        boolean result = false;
+        String SQL_CHECK_DB = "SELECT * FROM " + DBHelper.TRIP_TABLE
+                + " WHERE " + DBHelper.TRIP_ID + " = '" + value
+                + "' LIMIT 1";
+        if(requestedButNotCompleted.contains(value)){
+            result = true;
+        }
+        else if(ATData.rawQuery(SQL_CHECK_DB, null).getCount()>0){
+            result = true;
+        }
+        return result;
+
     }
 }

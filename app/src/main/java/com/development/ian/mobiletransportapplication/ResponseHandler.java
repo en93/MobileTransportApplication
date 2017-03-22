@@ -13,6 +13,6 @@ import org.json.JSONObject;
 
 public interface ResponseHandler {
     public void onSuccess(AtApiManager.TAG tag, JSONArray dataArray) throws JSONException;
-    public void onFailure(AtApiManager.TAG tag, String detail);
+    public void onFailure(AtApiManager.TAG tag, String detail, JSONException e);
 }
 

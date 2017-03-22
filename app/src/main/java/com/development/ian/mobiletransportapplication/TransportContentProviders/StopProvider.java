@@ -7,6 +7,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.support.annotation.Nullable;
 
+import com.development.ian.mobiletransportapplication.AtApiManager;
 import com.development.ian.mobiletransportapplication.DBHelper;
 
 /**
@@ -18,6 +19,16 @@ public class StopProvider extends ContentProvider {
     private static final String AUTHORITY = "com.example.ian.MobileTransportApplication.StopProvider";
     private static final String BASE_PATH = "StopData";
     public static final Uri CONTENT_URI = Uri.parse("content://" + AUTHORITY + "/" + BASE_PATH );
+
+    private static final String SQL_GET_STOP =
+            "SELECT * "
+                    +"FROM " + DBHelper.STOP_TABLE + " stop, " + DBHelper.SAVED_STOP_TABLE + " saved "
+                    +" WHERE stop." + DBHelper.STOP_ID
+                    + " = saved."+ DBHelper.SAVED_STOP_ID;
+
+    private static final String SQL_GET_STOP_SIMPLE_TEST =
+            "SELECT * "
+                    +"FROM " + DBHelper.STOP_TABLE;
 
     private static SQLiteDatabase ATData;
 
@@ -35,7 +46,11 @@ public class StopProvider extends ContentProvider {
     @Nullable
     @Override
     public Cursor query(Uri uri, String[] strings, String s, String[] strings1, String s1) {
-        return ATData.query(DBHelper.STOP_TABLE, DBHelper.STOPS_COLUMNS, s,null, null,null, DBHelper.STOPS_ID + " DESC");
+        return ATData.query(DBHelper.STOP_TABLE, DBHelper.STOP_COLUMNS, s,null, null,null, DBHelper.STOP_ID + " DESC");
+    }
+
+    public Cursor getStopCursor(){
+        return ATData.rawQuery(SQL_GET_STOP_SIMPLE_TEST, null);
     }
 
     @Nullable
