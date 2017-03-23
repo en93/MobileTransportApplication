@@ -35,6 +35,17 @@ public class TripProvider extends ContentProvider {
         if(ATData == null) {
             ATData = helper.getWritableDatabase();
         }
+//        ATData.rawQuery(
+//                "INSERT INTO trip(route_id, service_id, trip_id, trip_headsign, direction_id) VALUES('88103-20170310094731_v52.8', '12881052789-20170310094731_v52.8',
+// '12881052789-20170310094731_v52.8', 'Newmarket' 0)",null);
+//        ContentValues test = new ContentValues();
+//        test.put(DBHelper.TRIP_ROUTE_ID, "88103-20170310094731_v52.8");
+//        test.put(DBHelper.TRIP_SERVICE_ID, "12881052789-20170310094731_v52.8");
+//        test.put(DBHelper.TRIP_ID, "12881052789-20170310094731_v52.8" );
+//        test.put(DBHelper.TRIP_HEADSIGN, "Newmarket");
+//        test.put(DBHelper.TRIP_DIRECTION, 0);
+//        insert(CONTENT_URI, test);
+
         return true;
     }
 

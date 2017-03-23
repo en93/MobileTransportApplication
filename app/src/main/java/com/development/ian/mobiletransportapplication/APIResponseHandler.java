@@ -135,23 +135,16 @@ public class APIResponseHandler implements ResponseHandler {
                     arrivalValues.put(DBHelper.ARRIVAL_TIME_SECONDS, dataObject.getString(DBHelper.ARRIVAL_TIME_SECONDS));
                     arrivalProvider.insert(ArrivalProvider.CONTENT_URI, arrivalValues);
 
-                    //todo check there is not already the values in db
                     if(!tripProvider.containsKeyValue(dataObject.getString(DBHelper.ARRIVAL_TRIP_ID))){
                         APIAccess.getTrip(dataObject.getString(DBHelper.ARRIVAL_TRIP_ID), context, this);
                     }
-
-
                 }
-
-
-
             }catch (JSONException e){
                 throw e;
             }
         }
         else if(tag == AtApiManager.TAG.getRoute){
             try {
-
                 JSONObject dataObject = dataArray.getJSONObject(0);
                 ContentValues routeValues = new ContentValues();
                 routeValues.put(DBHelper.ROUTE_ID, dataObject.getString(DBHelper.ROUTE_ID));
@@ -163,9 +156,7 @@ public class APIResponseHandler implements ResponseHandler {
                 throw e;
             }
         }
-
         else if(tag == AtApiManager.TAG.getTrip){
-
             JSONObject dataObject = dataArray.getJSONObject(0);
             ContentValues tripValues = new ContentValues();
             tripValues.put(DBHelper.TRIP_ID, dataObject.getString(DBHelper.TRIP_ID));
@@ -176,12 +167,14 @@ public class APIResponseHandler implements ResponseHandler {
             tripProvider.insert(TripProvider.CONTENT_URI, tripValues);
 
             //Call for route values using routeID
-            //todo check there is not already the values in db
-            APIAccess.getRoute(dataObject.getString(DBHelper.TRIP_ROUTE_ID), this);
+            if(!routeProvider.containsKeyValue(dataObject.getString(DBHelper.TRIP_ROUTE_ID))) {
+                APIAccess.getRoute(dataObject.getString(DBHelper.TRIP_ROUTE_ID), this);
+            }
 
             //Call for calender values by serviceID
-            //todo check there is not already the values in db
-            APIAccess.getCalender(dataObject.getString(DBHelper.TRIP_SERVICE_ID), this);
+            if(!calenderProvider.containsKeyValue(dataObject.getString(DBHelper.TRIP_SERVICE_ID))) {
+                APIAccess.getCalender(dataObject.getString(DBHelper.TRIP_SERVICE_ID), this);
+            }
         }
         else if(tag == AtApiManager.TAG.getCalender){
             if(calenderProvider ==null){

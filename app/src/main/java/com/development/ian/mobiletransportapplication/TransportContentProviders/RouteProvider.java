@@ -10,6 +10,8 @@ import android.support.annotation.Nullable;
 
 import com.development.ian.mobiletransportapplication.DBHelper;
 
+import java.util.ArrayList;
+
 /**
  * Created by Ian on 3/18/2017.
  */
@@ -22,6 +24,8 @@ public class RouteProvider extends ContentProvider {
 
     private static SQLiteDatabase ATData;
 
+    public static ArrayList<String> requestedButNotCompleted = new ArrayList<String>();
+
 
     @Override
     public boolean onCreate() {
@@ -30,6 +34,14 @@ public class RouteProvider extends ContentProvider {
         if(ATData == null) {
             ATData = helper.getWritableDatabase();
         }
+
+//        ContentValues test = new ContentValues();
+//        test.put(DBHelper.ROUTE_ID, "32102-20170310094731_v52.8");
+//        test.put(DBHelper.ROUTE_AGENCY_ID, "NZBML");
+//        test.put(DBHelper.ROUTE_SHORT_NAME, "321");
+//        test.put(DBHelper.ROUTE_LONG_NAME, "Britomart to Middlemore station via Greenlane");
+//        insert(CONTENT_URI, test);
+
         return true;
     }
 
@@ -61,5 +73,20 @@ public class RouteProvider extends ContentProvider {
     @Override
     public int update(@NonNull Uri uri, @Nullable ContentValues contentValues, @Nullable String s, @Nullable String[] strings) {
         return ATData.update(DBHelper.ROUTE_TABLE, contentValues, s, strings);
+    }
+
+    public boolean containsKeyValue(String value) {
+        boolean result = false;
+        String SQL_CHECK_DB = "SELECT * FROM " + DBHelper.ROUTE_TABLE
+                + " WHERE " + DBHelper.ROUTE_ID + " = '" + value
+                + "' LIMIT 1";
+        if(requestedButNotCompleted.contains(value)){
+            result = true;
+        }
+        else if(ATData.rawQuery(SQL_CHECK_DB, null).getCount()>0){
+            result = true;
+        }
+        return result;
+
     }
 }

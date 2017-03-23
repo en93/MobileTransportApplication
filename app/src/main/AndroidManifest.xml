@@ -24,7 +24,8 @@
             android:name=".AddNewStopActivity"
             android:label="@string/title_activity_add_new_stop"
             android:parentActivityName=".StopsNavigationActivity"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:theme="@style/AppTheme.NoActionBar"
+            android:screenOrientation="portrait">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.development.ian.mobiletransportapplication.StopsNavigationActivity"/>

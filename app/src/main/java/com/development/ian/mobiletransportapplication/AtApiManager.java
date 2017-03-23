@@ -11,6 +11,8 @@ import com.android.volley.toolbox.DiskBasedCache;
 import com.android.volley.toolbox.HurlStack;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.development.ian.mobiletransportapplication.TransportContentProviders.ArrivalProvider;
+import com.development.ian.mobiletransportapplication.TransportContentProviders.CalenderProvider;
+import com.development.ian.mobiletransportapplication.TransportContentProviders.RouteProvider;
 import com.development.ian.mobiletransportapplication.TransportContentProviders.TripProvider;
 //import com.development.ian.mobiletransportapplication.TransportContentProviders.StationProvider;
 
@@ -45,7 +47,27 @@ public class AtApiManager {
     static Network network;
     static RequestQueue requestQueue;
 
+    static int requestsMade =0;
+    static int requestsActive=0;
+
     private Context context;
+
+    private synchronized static void updateCallNumbers(int i){
+        if(i == 1){
+            requestsMade++;
+            requestsActive++;
+        }else if(i == -1){
+            requestsActive--;
+        }
+    }
+
+
+//    public int getRequestsMade(){
+//        return requestsMade;
+//    }
+//    public int getRequestsActive(){
+//        return requestsActive;
+//    }
 
 
     public void GetStopById(final String id, final Context context, final APIResponseHandler responseHandler){
@@ -65,6 +87,8 @@ public class AtApiManager {
                    responseHandler.onFailure(REQUEST_TAG, id, e);
                }catch (Exception e){
                    e.printStackTrace();
+               }finally {
+                   updateCallNumbers(-1);
                }
            }
         }, new Response.ErrorListener() {
@@ -87,13 +111,13 @@ public class AtApiManager {
 
         };
         jsonRequest.setTag(REQUEST_TAG);
+        updateCallNumbers(1);
         requestQueue.add(jsonRequest);
     }
 
     public void getArrivalTimes(final String id, Context context, final APIResponseHandler responseHandler){
 
-        ArrivalProvider.requestedButNotCompleted.add(Integer.parseInt(id)); //todo investage if there will be concurency issues
-
+        ArrivalProvider.requestedButNotCompleted.add(Integer.parseInt(id));
         ConfirmQueueRunning(context);
         String requestUrl = REQUEST_Arrival_TIMES_URL  + id;
         final TAG REQUEST_TAG= TAG.getArrivals;
@@ -109,6 +133,7 @@ public class AtApiManager {
                 } catch (JSONException e) {
                     responseHandler.onFailure(REQUEST_TAG, id, e);
                 } finally {
+                    updateCallNumbers(-1);
                     ArrivalProvider.requestedButNotCompleted.remove(new Integer(Integer.parseInt(id)));
                 }
             }
@@ -124,6 +149,7 @@ public class AtApiManager {
                 }
             };
         jsonRequest.setTag(REQUEST_TAG);
+        updateCallNumbers(1);
         requestQueue.add(jsonRequest);
     }
 
@@ -148,8 +174,9 @@ public class AtApiManager {
                 }catch (Exception e){
                     e.printStackTrace();
                 }finally {
-                    TripProvider.requestedButNotCompleted.remove(id); // todo test this!
-                } //todo handle failure better
+                    TripProvider.requestedButNotCompleted.remove(id);
+                    updateCallNumbers(-1);
+                }
             }
         }, new Response.ErrorListener() {
             @Override
@@ -163,6 +190,7 @@ public class AtApiManager {
             }
         };
         jsonRequest.setTag(REQUEST_TAG);
+        updateCallNumbers(1);
         requestQueue.add(jsonRequest);
     }
 
@@ -178,6 +206,8 @@ public class AtApiManager {
     }
 
     public void getRoute(final String id, final APIResponseHandler responseHandler){
+        RouteProvider.requestedButNotCompleted.add(id);
+
         ConfirmQueueRunning();
         String requestUrl = REQUEST_ROUTE_URL + id;
         final TAG REQUEST_TAG= TAG.getRoute;
@@ -195,6 +225,9 @@ public class AtApiManager {
                     // todo handle failure
                 }catch (Exception e){
                     e.printStackTrace();
+                }finally {
+                    updateCallNumbers(-1);
+                    RouteProvider.requestedButNotCompleted.remove(id);
                 }
             }
         }, new Response.ErrorListener() {
@@ -209,10 +242,14 @@ public class AtApiManager {
             }
         };
         jsonRequest.setTag(REQUEST_TAG);
+        updateCallNumbers(1);
         requestQueue.add(jsonRequest);
     }
 
     public void getCalender(final String id, final APIResponseHandler responseHandler){
+
+        CalenderProvider.requestedButNotCompleted.add(id);
+
         ConfirmQueueRunning();
         String requestUrl = REQUEST_CALENDER_URL + id;
         final TAG REQUEST_TAG= TAG.getCalender;
@@ -229,6 +266,9 @@ public class AtApiManager {
                     // todo handle failure
                 }catch (Exception e){
                     e.printStackTrace();
+                }finally {
+                    updateCallNumbers(-1);
+                    CalenderProvider.requestedButNotCompleted.remove(id);
                 }
             }
         }, new Response.ErrorListener() {
@@ -243,6 +283,7 @@ public class AtApiManager {
             }
         };
         jsonRequest.setTag(REQUEST_TAG);
+        updateCallNumbers(1);
         requestQueue.add(jsonRequest);
     }
 

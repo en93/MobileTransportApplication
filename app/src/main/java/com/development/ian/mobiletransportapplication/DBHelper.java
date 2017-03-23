@@ -13,7 +13,7 @@ public class DBHelper extends SQLiteOpenHelper {
     private static DBHelper instance;
 
     final static private String DATABASE_NAME ="AucklandTransport.db";
-    final static private int DATBASE_VERSION = 9;
+    final static private int DATBASE_VERSION = 12;
 
 
 //    public static final String STOPS_TABLE = "stops";

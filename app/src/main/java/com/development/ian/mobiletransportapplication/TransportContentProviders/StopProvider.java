@@ -20,15 +20,15 @@ public class StopProvider extends ContentProvider {
     private static final String BASE_PATH = "StopData";
     public static final Uri CONTENT_URI = Uri.parse("content://" + AUTHORITY + "/" + BASE_PATH );
 
-    private static final String SQL_GET_STOP =
-            "SELECT * "
-                    +"FROM " + DBHelper.STOP_TABLE + " stop, " + DBHelper.SAVED_STOP_TABLE + " saved "
-                    +" WHERE stop." + DBHelper.STOP_ID
-                    + " = saved."+ DBHelper.SAVED_STOP_ID;
-
-    private static final String SQL_GET_STOP_SIMPLE_TEST =
-            "SELECT * "
-                    +"FROM " + DBHelper.STOP_TABLE;
+//    private static final String SQL_GET_STOP =
+//            "SELECT * "
+//                    +"FROM " + DBHelper.STOP_TABLE + " stop, " + DBHelper.SAVED_STOP_TABLE + " saved "
+//                    +" WHERE stop." + DBHelper.STOP_ID
+//                    + " = saved."+ DBHelper.SAVED_STOP_ID;
+//
+//    private static final String SQL_GET_STOP_SIMPLE_TEST =
+//            "SELECT * "
+//                    +"FROM " + DBHelper.STOP_TABLE;
 
     private static SQLiteDatabase ATData;
 
@@ -49,9 +49,9 @@ public class StopProvider extends ContentProvider {
         return ATData.query(DBHelper.STOP_TABLE, DBHelper.STOP_COLUMNS, s,null, null,null, DBHelper.STOP_ID + " DESC");
     }
 
-    public Cursor getStopCursor(){
-        return ATData.rawQuery(SQL_GET_STOP_SIMPLE_TEST, null);
-    }
+//    public Cursor getStopCursor(){
+//        return ATData.rawQuery(SQL_GET_STOP_SIMPLE_TEST, null);
+//    }
 
     @Nullable
     @Override

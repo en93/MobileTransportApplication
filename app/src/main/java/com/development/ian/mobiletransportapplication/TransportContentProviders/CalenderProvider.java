@@ -10,6 +10,8 @@ import android.support.annotation.Nullable;
 
 import com.development.ian.mobiletransportapplication.DBHelper;
 
+import java.util.ArrayList;
+
 /**
  * Created by Ian on 3/18/2017.
  */
@@ -21,6 +23,8 @@ public class CalenderProvider extends ContentProvider {
     public static final Uri CONTENT_URI = Uri.parse("content://" + AUTHORITY + "/" + BASE_PATH );
 
     private static SQLiteDatabase ATData;
+    public static ArrayList<String> requestedButNotCompleted = new ArrayList<String>();
+
 
 
     @Override
@@ -30,6 +34,20 @@ public class CalenderProvider extends ContentProvider {
         if(ATData == null) {
             ATData = helper.getWritableDatabase();
         }
+
+//        ContentValues test = new ContentValues();
+//        test.put(DBHelper.CALENDER_SERVICE_ID, "12881052794-20170310094731_v52.8");
+//        test.put(DBHelper.CALENDER_MONDAY, 1);
+//        test.put(DBHelper.CALENDER__TUESDAY, 1);
+//        test.put(DBHelper.CALENDER_WEDNESDAY,1);
+//        test.put(DBHelper.CALENDER_THURSDAY, 1);
+//        test.put(DBHelper.CALENDER_FRIDAY, 1);
+//        test.put(DBHelper.CALENDER_SATURDAY, 0);
+//        test.put(DBHelper.CALENDER_SUNDAY, 0);
+//        test.put(DBHelper.CALENDER_START, "2017-03-12T00:00:00.000Z");
+//        test.put(DBHelper.CALENDER_END, "2017-03-17T00:00:00.000Z");
+//        insert(CONTENT_URI, test);
+
         return true;
     }
 
@@ -61,5 +79,20 @@ public class CalenderProvider extends ContentProvider {
     @Override
     public int update(@NonNull Uri uri, @Nullable ContentValues contentValues, @Nullable String s, @Nullable String[] strings) {
         return ATData.update(DBHelper.CALENDER_TABLE, contentValues, s, strings);
+    }
+
+    public boolean containsKeyValue(String value) {
+        boolean result = false;
+        String SQL_CHECK_DB = "SELECT * FROM " + DBHelper.CALENDER_TABLE
+                + " WHERE " + DBHelper.CALENDER_SERVICE_ID + " = '" + value
+                + "' LIMIT 1";
+        if(requestedButNotCompleted.contains(value)){
+            result = true;
+        }
+        else if(ATData.rawQuery(SQL_CHECK_DB, null).getCount()>0){
+            result = true;
+        }
+        return result;
+
     }
 }
