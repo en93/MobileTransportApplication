@@ -93,4 +93,13 @@ public class TripProvider extends ContentProvider {
         return result;
 
     }
+
+    public boolean isEmpty(){
+        boolean result = false;
+        String SQL_CHECK_EMPTY = "SELECT * FROM " + DBHelper.TRIP_TABLE + " LIMIT 1";
+        if(ATData.rawQuery(SQL_CHECK_EMPTY, null).getCount() == 0){
+            result = true;
+        }
+        return result;
+    }
 }

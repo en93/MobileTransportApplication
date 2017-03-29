@@ -13,7 +13,7 @@ public class DBHelper extends SQLiteOpenHelper {
     private static DBHelper instance;
 
     final static private String DATABASE_NAME ="AucklandTransport.db";
-    final static private int DATBASE_VERSION = 12;
+    final static private int DATBASE_VERSION = 7;
 
 
 //    public static final String STOPS_TABLE = "stops";
@@ -64,7 +64,7 @@ public class DBHelper extends SQLiteOpenHelper {
             + " VARCHAR(255), " + TRIP_DIRECTION + " INTEGER)";
 
     //For setting up table of route values
-    public static final String ROUTE_TABLE = "route_table";
+    public static final String ROUTE_TABLE = "route";
     public static final String ROUTE_ID = "route_id";
     public static final String ROUTE_AGENCY_ID = "agency_id";
     public static final String ROUTE_SHORT_NAME = "route_short_name";
@@ -75,7 +75,7 @@ public class DBHelper extends SQLiteOpenHelper {
             + " VARCHAR(255))";
 
     //For setting up calender dates
-    public static final String CALENDER_TABLE = "calender_table";
+    public static final String CALENDER_TABLE = "calender";
     public static final String CALENDER_SERVICE_ID = "service_id";
     public static final String CALENDER_MONDAY = "monday";
     public static final String CALENDER__TUESDAY = "tuesday";
@@ -97,7 +97,7 @@ public class DBHelper extends SQLiteOpenHelper {
             + CALENDER_START + " VARCHAR(255), " + CALENDER_END + " VARCHAR(255))"; //todo use compouund primary key instead
 
     //For setting up version table
-    public static final String VERSION_TABLE = "version_table";
+    public static final String VERSION_TABLE = "version";
     public static final String VERSION_ID ="version";
     public static final String VERSION_START = "startdate";
     public static final String VERSON_END = "enddate";
@@ -113,8 +113,10 @@ public class DBHelper extends SQLiteOpenHelper {
     public static final String SAVED_STOP_CREATE = "CREATE TABLE " + SAVED_STOP_TABLE + "("
             + SAVED_STOP_ID + " INTEGER PRIMARY KEY)";
 
-    //todo do i need a table connecting trip and stop?
-
+//    public static final String GLOBALS_TABLE = "global";
+//    public static final String GLOBALS_HAS_SETUP= "has_setup";
+//    public static final String[] GLOBALS_COLUMNS = {GLOBALS_HAS_SETUP};
+//    public static final String GLOBALS_CREATE = "CREATE TABLE " + GLOBALS_TABLE + "(" +
 
     private DBHelper(Context context) {
         super(context, DATABASE_NAME, null, DATBASE_VERSION);
@@ -135,7 +137,17 @@ public class DBHelper extends SQLiteOpenHelper {
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         //todo have clear all rather than specifying manually
 
+        //remove all old names
         db.execSQL("DROP TABLE IF EXISTS " + "stops"); //todo remove from app
+        db.execSQL("DROP TABLE IF EXISTS " + "stop"); //todo remove from app
+        db.execSQL("DROP TABLE IF EXISTS " + "arrival"); //todo remove from app
+        db.execSQL("DROP TABLE IF EXISTS " + "trip"); //todo remove from app
+        db.execSQL("DROP TABLE IF EXISTS " + "route_table"); //todo remove from app
+        db.execSQL("DROP TABLE IF EXISTS " + "calender_table"); //todo remove from app
+        db.execSQL("DROP TABLE IF EXISTS " + "version_table"); //todo remove from app
+        db.execSQL("DROP TABLE IF EXISTS " + "saved_stops_table"); //todo remove from app
+
+
 
         db.execSQL("DROP TABLE IF EXISTS " + STOP_TABLE);
         db.execSQL("DROP TABLE IF EXISTS " + TRIP_TABLE);

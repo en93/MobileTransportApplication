@@ -31,7 +31,7 @@ public class BusArrival {
         this.route = PLACE_HOLDER;
 
 //        responseHandler = new APIResponseHandler(this, );
-//        APIAccess.getRoute(this.tripId, responseHandler);
+//        APIAccess.getRouteById(this.tripId, responseHandler);
     }
 
     public String getArrivalTime() {

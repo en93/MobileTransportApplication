@@ -7,7 +7,7 @@ import android.os.Parcelable;
  * Created by Ian on 12/5/2016.
  */
 
-public class BusStop implements Parcelable{
+public class BusStop implements Parcelable{             //todo remove class as no longer needed
     private int id;
     private String name;
     private double latitude ;

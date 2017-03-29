@@ -33,6 +33,10 @@ public class AtApiManager {
 
     public static final String REQUEST_STOP_URL = "https://api.at.govt.nz/v2/gtfs/stops/stopId/";
     public static final String REQUEST_Arrival_TIMES_URL = "https://api.at.govt.nz/v2/gtfs/stopTimes/stopId/";
+    public static final String REQUEST_TRIPS_ALL_URL = "https://api.at.govt.nz/v2/gtfs/trips";
+    public static final String REQUEST_ROUTES_ALL_URL = "https://api.at.govt.nz/v2/gtfs/routes";
+    public static final String REQUEST_CALENDER_ALL_URL = "https://api.at.govt.nz/v2/gtfs/calendar";
+
     public static final String REQUEST_ROUTE_URL = "https://api.at.govt.nz/v2/gtfs/routes/routeId/";
     public static final String REQUEST_TRIP_URL = "https://api.at.govt.nz/v2/gtfs/trips/tripId/";
     public static final String REQUEST_CALENDER_URL = "https://api.at.govt.nz/v2/gtfs/calendar/serviceId/";
@@ -52,13 +56,125 @@ public class AtApiManager {
 
     private Context context;
 
-    private synchronized static void updateCallNumbers(int i){
-        if(i == 1){
-            requestsMade++;
-            requestsActive++;
-        }else if(i == -1){
-            requestsActive--;
-        }
+//    private synchronized static void updateCallNumbers(int i){
+////        if(i == 1){
+////            requestsMade++;
+////            requestsActive++;
+////        }else if(i == -1){
+////            requestsActive--;
+////        }
+//    }
+
+    public void getAllTrips(Context context, final APIResponseHandler responseHandler){ //todo write handling of response and initial call to this
+
+//        ArrivalProvider.requestedButNotCompleted.add(Integer.parseInt(id));
+        ConfirmQueueRunning(context);
+        String requestUrl = REQUEST_TRIPS_ALL_URL;
+        final TAG REQUEST_TAG= TAG.getTripAll;
+        JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.GET, requestUrl, null, new Response.Listener<JSONObject>(){
+
+            @Override
+            public void onResponse(JSONObject response){
+                JSONArray dataArray;
+
+                try {
+                    dataArray = response.getJSONArray("response");
+                    responseHandler.onSuccess(REQUEST_TAG, dataArray);
+                } catch (JSONException e) {
+                    responseHandler.onFailure(REQUEST_TAG,e.getMessage(), e);
+                }
+//                finally {
+//                    updateCallNumbers(-1);
+//                    ArrivalProvider.requestedButNotCompleted.remove(new Integer(Integer.parseInt(id)));
+//                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {}
+        }){
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError{
+                Map<String, String> headers = new HashMap<String, String>();
+                headers.put(SUBKEYLABEL, KEY);
+                return headers;
+            }
+        };
+        jsonRequest.setTag(REQUEST_TAG);
+//        updateCallNumbers(1); //todo remove
+        requestQueue.add(jsonRequest);
+    }
+
+    public void getAllRoutes(Context context, final APIResponseHandler responseHandler){ //todo write handling of response and initial call to this
+
+//        ArrivalProvider.requestedButNotCompleted.add(Integer.parseInt(id));
+        ConfirmQueueRunning(context);
+        String requestUrl = REQUEST_ROUTES_ALL_URL;
+        final TAG REQUEST_TAG= TAG.getRouteAll;
+        JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.GET, requestUrl, null, new Response.Listener<JSONObject>(){
+
+            @Override
+            public void onResponse(JSONObject response){
+                JSONArray dataArray;
+
+                try {
+                    dataArray = response.getJSONArray("response");
+                    responseHandler.onSuccess(REQUEST_TAG, dataArray);
+                } catch (JSONException e) {
+                    responseHandler.onFailure(REQUEST_TAG,e.getMessage(), e);
+                }
+//                finally {
+//                    updateCallNumbers(-1);
+//                    ArrivalProvider.requestedButNotCompleted.remove(new Integer(Integer.parseInt(id)));
+//                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {}
+        }){
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError{
+                Map<String, String> headers = new HashMap<String, String>();
+                headers.put(SUBKEYLABEL, KEY);
+                return headers;
+            }
+        };
+        jsonRequest.setTag(REQUEST_TAG);
+//        updateCallNumbers(1); //todo remove
+        requestQueue.add(jsonRequest);
+    }
+
+    public void getAllCalenders(Context context, final APIResponseHandler responseHandler){ //todo write handling of response and initial call to this
+
+//        ArrivalProvider.requestedButNotCompleted.add(Integer.parseInt(id));
+        ConfirmQueueRunning(context);
+        String requestUrl = REQUEST_CALENDER_ALL_URL;
+        final TAG REQUEST_TAG= TAG.getCalenderAll;
+        JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.GET, requestUrl, null, new Response.Listener<JSONObject>(){
+
+            @Override
+            public void onResponse(JSONObject response){
+                JSONArray dataArray;
+
+                try {
+                    dataArray = response.getJSONArray("response");
+                    responseHandler.onSuccess(REQUEST_TAG, dataArray);
+                } catch (JSONException e) {
+                    responseHandler.onFailure(REQUEST_TAG,e.getMessage(), e);
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {}
+        }){
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError{
+                Map<String, String> headers = new HashMap<String, String>();
+                headers.put(SUBKEYLABEL, KEY);
+                return headers;
+            }
+        };
+        jsonRequest.setTag(REQUEST_TAG);
+        requestQueue.add(jsonRequest);
     }
 
 
@@ -88,7 +204,7 @@ public class AtApiManager {
                }catch (Exception e){
                    e.printStackTrace();
                }finally {
-                   updateCallNumbers(-1);
+//                   updateCallNumbers(-1);
                }
            }
         }, new Response.ErrorListener() {
@@ -111,7 +227,7 @@ public class AtApiManager {
 
         };
         jsonRequest.setTag(REQUEST_TAG);
-        updateCallNumbers(1);
+//        updateCallNumbers(1);
         requestQueue.add(jsonRequest);
     }
 
@@ -133,7 +249,7 @@ public class AtApiManager {
                 } catch (JSONException e) {
                     responseHandler.onFailure(REQUEST_TAG, id, e);
                 } finally {
-                    updateCallNumbers(-1);
+//                    updateCallNumbers(-1);
                     ArrivalProvider.requestedButNotCompleted.remove(new Integer(Integer.parseInt(id)));
                 }
             }
@@ -149,50 +265,50 @@ public class AtApiManager {
                 }
             };
         jsonRequest.setTag(REQUEST_TAG);
-        updateCallNumbers(1);
+//        updateCallNumbers(1);
         requestQueue.add(jsonRequest);
     }
 
-    public void getTrip(final String id, Context context, final APIResponseHandler responseHandler){
-
-        TripProvider.requestedButNotCompleted.add(id);
-
-        ConfirmQueueRunning(context);
-        String requestUrl = REQUEST_TRIP_URL  + id;
-        final TAG REQUEST_TAG= TAG.getTrip;
-        JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.GET, requestUrl, null, new Response.Listener<JSONObject>(){
-
-            @Override
-            public void onResponse(JSONObject response){
-                JSONArray dataArray;
-
-                try {
-                    dataArray = response.getJSONArray("response");
-                    responseHandler.onSuccess(REQUEST_TAG, dataArray);
-                } catch (JSONException e) {
-                    responseHandler.onFailure(REQUEST_TAG, id, e);
-                }catch (Exception e){
-                    e.printStackTrace();
-                }finally {
-                    TripProvider.requestedButNotCompleted.remove(id);
-                    updateCallNumbers(-1);
-                }
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {}
-        }){
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError{
-                Map<String, String> headers = new HashMap<String, String>();
-                headers.put(SUBKEYLABEL, KEY);
-                return headers;
-            }
-        };
-        jsonRequest.setTag(REQUEST_TAG);
-        updateCallNumbers(1);
-        requestQueue.add(jsonRequest);
-    }
+//    public void getTripById(final String id, Context context, final APIResponseHandler responseHandler){
+//
+//        TripProvider.requestedButNotCompleted.add(id);
+//
+//        ConfirmQueueRunning(context);
+//        String requestUrl = REQUEST_TRIP_URL  + id;
+//        final TAG REQUEST_TAG= TAG.getTrip;
+//        JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.GET, requestUrl, null, new Response.Listener<JSONObject>(){
+//
+//            @Override
+//            public void onResponse(JSONObject response){
+//                JSONArray dataArray;
+//
+//                try {
+//                    dataArray = response.getJSONArray("response");
+//                    responseHandler.onSuccess(REQUEST_TAG, dataArray);
+//                } catch (JSONException e) {
+//                    responseHandler.onFailure(REQUEST_TAG, id, e);
+//                }catch (Exception e){
+//                    e.printStackTrace();
+//                }finally {
+//                    TripProvider.requestedButNotCompleted.remove(id);
+//                    updateCallNumbers(-1);
+//                }
+//            }
+//        }, new Response.ErrorListener() {
+//            @Override
+//            public void onErrorResponse(VolleyError error) {}
+//        }){
+//            @Override
+//            public Map<String, String> getHeaders() throws AuthFailureError{
+//                Map<String, String> headers = new HashMap<String, String>();
+//                headers.put(SUBKEYLABEL, KEY);
+//                return headers;
+//            }
+//        };
+//        jsonRequest.setTag(REQUEST_TAG);
+//        updateCallNumbers(1);
+//        requestQueue.add(jsonRequest);
+//    }
 
     private void ConfirmQueueRunning(Context context) {
         if(requestQueue == null) {
@@ -205,87 +321,87 @@ public class AtApiManager {
         ConfirmQueueRunning(this.context);
     }
 
-    public void getRoute(final String id, final APIResponseHandler responseHandler){
-        RouteProvider.requestedButNotCompleted.add(id);
+//    public void getRouteById(final String id, final APIResponseHandler responseHandler){
+//        RouteProvider.requestedButNotCompleted.add(id);
+//
+//        ConfirmQueueRunning();
+//        String requestUrl = REQUEST_ROUTE_URL + id;
+//        final TAG REQUEST_TAG= TAG.getRoute;
+//        JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.GET, requestUrl, null, new Response.Listener<JSONObject>(){
+//
+//            @Override
+//            public void onResponse(JSONObject response){
+//                JSONArray dataArray;
+//                try {
+//                    dataArray = response.getJSONArray("response");
+////                    ArrivalsActivity.ResponseHandler.onSuccess(TAG.getArrivals, dataArray);
+//                    responseHandler.onSuccess(REQUEST_TAG, dataArray);
+//                } catch (JSONException e) {
+//                    responseHandler.onFailure(REQUEST_TAG, id, e);
+//                    // todo handle failure
+//                }catch (Exception e){
+//                    e.printStackTrace();
+//                }finally {
+//                    updateCallNumbers(-1);
+//                    RouteProvider.requestedButNotCompleted.remove(id);
+//                }
+//            }
+//        }, new Response.ErrorListener() {
+//            @Override
+//            public void onErrorResponse(VolleyError error) {}
+//        }){
+//            @Override
+//            public Map<String, String> getHeaders() throws AuthFailureError{
+//                Map<String, String> headers = new HashMap<String, String>();
+//                headers.put(SUBKEYLABEL, KEY);
+//                return headers;
+//            }
+//        };
+//        jsonRequest.setTag(REQUEST_TAG);
+//        updateCallNumbers(1);
+//        requestQueue.add(jsonRequest);
+//    }
 
-        ConfirmQueueRunning();
-        String requestUrl = REQUEST_ROUTE_URL + id;
-        final TAG REQUEST_TAG= TAG.getRoute;
-        JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.GET, requestUrl, null, new Response.Listener<JSONObject>(){
-
-            @Override
-            public void onResponse(JSONObject response){
-                JSONArray dataArray;
-                try {
-                    dataArray = response.getJSONArray("response");
-//                    ArrivalsActivity.ResponseHandler.onSuccess(TAG.getArrivals, dataArray);
-                    responseHandler.onSuccess(REQUEST_TAG, dataArray);
-                } catch (JSONException e) {
-                    responseHandler.onFailure(REQUEST_TAG, id, e);
-                    // todo handle failure
-                }catch (Exception e){
-                    e.printStackTrace();
-                }finally {
-                    updateCallNumbers(-1);
-                    RouteProvider.requestedButNotCompleted.remove(id);
-                }
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {}
-        }){
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError{
-                Map<String, String> headers = new HashMap<String, String>();
-                headers.put(SUBKEYLABEL, KEY);
-                return headers;
-            }
-        };
-        jsonRequest.setTag(REQUEST_TAG);
-        updateCallNumbers(1);
-        requestQueue.add(jsonRequest);
-    }
-
-    public void getCalender(final String id, final APIResponseHandler responseHandler){
-
-        CalenderProvider.requestedButNotCompleted.add(id);
-
-        ConfirmQueueRunning();
-        String requestUrl = REQUEST_CALENDER_URL + id;
-        final TAG REQUEST_TAG= TAG.getCalender;
-        JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.GET, requestUrl, null, new Response.Listener<JSONObject>(){
-
-            @Override
-            public void onResponse(JSONObject response){
-                JSONArray dataArray;
-                try {
-                    dataArray = response.getJSONArray("response");
-                    responseHandler.onSuccess(REQUEST_TAG, dataArray);
-                } catch (JSONException e) {
-                    responseHandler.onFailure(REQUEST_TAG, id, e);
-                    // todo handle failure
-                }catch (Exception e){
-                    e.printStackTrace();
-                }finally {
-                    updateCallNumbers(-1);
-                    CalenderProvider.requestedButNotCompleted.remove(id);
-                }
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {}
-        }){
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError{
-                Map<String, String> headers = new HashMap<String, String>();
-                headers.put(SUBKEYLABEL, KEY);
-                return headers;
-            }
-        };
-        jsonRequest.setTag(REQUEST_TAG);
-        updateCallNumbers(1);
-        requestQueue.add(jsonRequest);
-    }
+//    public void getCalenderById(final String id, final APIResponseHandler responseHandler){
+//
+//        CalenderProvider.requestedButNotCompleted.add(id);
+//
+//        ConfirmQueueRunning();
+//        String requestUrl = REQUEST_CALENDER_URL + id;
+//        final TAG REQUEST_TAG= TAG.getCalender;
+//        JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.GET, requestUrl, null, new Response.Listener<JSONObject>(){
+//
+//            @Override
+//            public void onResponse(JSONObject response){
+//                JSONArray dataArray;
+//                try {
+//                    dataArray = response.getJSONArray("response");
+//                    responseHandler.onSuccess(REQUEST_TAG, dataArray);
+//                } catch (JSONException e) {
+//                    responseHandler.onFailure(REQUEST_TAG, id, e);
+//                    // todo handle failure
+//                }catch (Exception e){
+//                    e.printStackTrace();
+//                }finally {
+//                    updateCallNumbers(-1);
+//                    CalenderProvider.requestedButNotCompleted.remove(id);
+//                }
+//            }
+//        }, new Response.ErrorListener() {
+//            @Override
+//            public void onErrorResponse(VolleyError error) {}
+//        }){
+//            @Override
+//            public Map<String, String> getHeaders() throws AuthFailureError{
+//                Map<String, String> headers = new HashMap<String, String>();
+//                headers.put(SUBKEYLABEL, KEY);
+//                return headers;
+//            }
+//        };
+//        jsonRequest.setTag(REQUEST_TAG);
+//        updateCallNumbers(1);
+//        requestQueue.add(jsonRequest);
+//    }
 
 
 
@@ -311,6 +427,6 @@ public class AtApiManager {
         }catch (Exception e){}
     }
 
-    public enum TAG{getStop, getArrivals, getRoute, getCalender, getVersion, getTrip}
+    public enum TAG{getStop, getArrivals, getRoute, getCalender, getVersion, getTrip, getTripAll, getRouteAll, getCalenderAll}
 }
 

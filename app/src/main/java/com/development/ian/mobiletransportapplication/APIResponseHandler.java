@@ -32,6 +32,7 @@ public class APIResponseHandler implements ResponseHandler {
     private Context context;
 
     private BusArrival busArrival;
+    private StopsNavigationActivity.CompletedCounter counter;
 
     private AtApiManager APIAccess = AtApiManager.getInstance();
 
@@ -61,17 +62,25 @@ public class APIResponseHandler implements ResponseHandler {
          calenderProvider= new CalenderProvider();
     }
 
-    public APIResponseHandler(BusArrival busArrival, Context context){
-        this.context = context;
-        this.busArrival = busArrival;
-        CreateProviders();
-    }
+//    public APIResponseHandler(BusArrival busArrival, Context context){
+//        this.context = context;
+//        this.busArrival = busArrival;
+//        CreateProviders();
+//    }
 
     public APIResponseHandler(View view, ListView list, Context context){
         this.view = view;
         this.list = list;
         this.context = context;
         CreateProviders();
+    }
+
+    public APIResponseHandler(View view, Context context, StopsNavigationActivity.CompletedCounter counter){
+        this.view = view;
+//        this.list = list;
+        this.context = context;
+        CreateProviders();
+        this.counter = counter;
     }
 
 
@@ -136,8 +145,52 @@ public class APIResponseHandler implements ResponseHandler {
                     arrivalProvider.insert(ArrivalProvider.CONTENT_URI, arrivalValues);
 
                     if(!tripProvider.containsKeyValue(dataObject.getString(DBHelper.ARRIVAL_TRIP_ID))){
-                        APIAccess.getTrip(dataObject.getString(DBHelper.ARRIVAL_TRIP_ID), context, this);
+//                        APIAccess.getTripById(dataObject.getString(DBHelper.ARRIVAL_TRIP_ID), context, this);
                     }
+                }
+            }catch (JSONException e){
+                throw e;
+            }
+        }
+        else if(tag == AtApiManager.TAG.getRouteAll){
+            try {
+                JSONObject dataObject;
+                for (int i = 0; i<dataArray.length(); i++) {
+                    dataObject = dataArray.getJSONObject(i);
+                    ContentValues routeValues = new ContentValues();
+                    routeValues.put(DBHelper.ROUTE_ID, dataObject.getString(DBHelper.ROUTE_ID));
+                    routeValues.put(DBHelper.ROUTE_AGENCY_ID, dataObject.getString(DBHelper.ROUTE_AGENCY_ID));
+                    routeValues.put(DBHelper.ROUTE_SHORT_NAME, dataObject.getString(DBHelper.ROUTE_SHORT_NAME));
+                    routeValues.put(DBHelper.ROUTE_LONG_NAME, dataObject.getString(DBHelper.ROUTE_LONG_NAME));
+                    routeProvider.insert(RouteProvider.CONTENT_URI, routeValues);
+                }
+                if(counter.CanRestoreUserControl()){
+                    StopsNavigationActivity.restoreUserControl();
+                }
+            }catch (JSONException e){
+                throw e;
+            }
+        }
+        else if(tag == AtApiManager.TAG.getCalenderAll){
+            try {
+                JSONObject dataObject;
+                for (int i = 0; i<dataArray.length(); i++) {
+                    dataObject = dataArray.getJSONObject(i);
+                    ContentValues calenderValues = new ContentValues();
+                    calenderValues.put(DBHelper.CALENDER_SERVICE_ID, dataObject.getString(DBHelper.CALENDER_SERVICE_ID));
+                    calenderValues.put(DBHelper.CALENDER_MONDAY, dataObject.getInt(DBHelper.CALENDER_MONDAY));
+                    calenderValues.put(DBHelper.CALENDER__TUESDAY, dataObject.getInt(DBHelper.CALENDER__TUESDAY));
+                    calenderValues.put(DBHelper.CALENDER_WEDNESDAY, dataObject.getInt(DBHelper.CALENDER_WEDNESDAY));
+                    calenderValues.put(DBHelper.CALENDER_THURSDAY, dataObject.getInt(DBHelper.CALENDER_THURSDAY));
+                    calenderValues.put(DBHelper.CALENDER_FRIDAY, dataObject.getInt(DBHelper.CALENDER_FRIDAY));
+                    calenderValues.put(DBHelper.CALENDER_SATURDAY, dataObject.getInt(DBHelper.CALENDER_SATURDAY));
+                    calenderValues.put(DBHelper.CALENDER_SUNDAY, dataObject.getInt(DBHelper.CALENDER_SUNDAY));
+                    calenderValues.put(DBHelper.CALENDER_START, dataObject.getString(DBHelper.CALENDER_START));
+                    calenderValues.put(DBHelper.CALENDER_END, dataObject.getString(DBHelper.CALENDER_END));
+                    calenderProvider.insert(CalenderProvider.CONTENT_URI, calenderValues);
+                }
+                if(counter.CanRestoreUserControl()){
+                    StopsNavigationActivity.restoreUserControl();
                 }
             }catch (JSONException e){
                 throw e;
@@ -168,13 +221,40 @@ public class APIResponseHandler implements ResponseHandler {
 
             //Call for route values using routeID
             if(!routeProvider.containsKeyValue(dataObject.getString(DBHelper.TRIP_ROUTE_ID))) {
-                APIAccess.getRoute(dataObject.getString(DBHelper.TRIP_ROUTE_ID), this);
+//                APIAccess.getRouteById(dataObject.getString(DBHelper.TRIP_ROUTE_ID), this);
             }
 
             //Call for calender values by serviceID
             if(!calenderProvider.containsKeyValue(dataObject.getString(DBHelper.TRIP_SERVICE_ID))) {
-                APIAccess.getCalender(dataObject.getString(DBHelper.TRIP_SERVICE_ID), this);
+//                APIAccess.getCalenderById(dataObject.getString(DBHelper.TRIP_SERVICE_ID), this);
             }
+        }
+        else if(tag == AtApiManager.TAG.getTripAll){
+//            JSONObject dataObject = dataArray.getJSONObject(0);
+            JSONObject dataObject;
+            for (int i = 0; i< dataArray.length(); i++) {
+                dataObject = dataArray.getJSONObject(i);
+                ContentValues tripValues = new ContentValues();
+                tripValues.put(DBHelper.TRIP_ID, dataObject.getString(DBHelper.TRIP_ID));
+                tripValues.put(DBHelper.TRIP_ROUTE_ID, dataObject.getString(DBHelper.TRIP_ROUTE_ID));
+                tripValues.put(DBHelper.TRIP_HEADSIGN, dataObject.getString(DBHelper.TRIP_HEADSIGN));
+                tripValues.put(DBHelper.TRIP_DIRECTION, dataObject.getString(DBHelper.TRIP_DIRECTION));
+                tripValues.put(DBHelper.TRIP_SERVICE_ID, dataObject.getString(DBHelper.TRIP_SERVICE_ID));
+                tripProvider.insert(TripProvider.CONTENT_URI, tripValues);
+            }
+            if(counter.CanRestoreUserControl()){
+                StopsNavigationActivity.restoreUserControl();
+            }
+
+            //Call for route values using routeID
+//            if(!routeProvider.containsKeyValue(dataObject.getString(DBHelper.TRIP_ROUTE_ID))) {
+////                APIAccess.getRouteById(dataObject.getString(DBHelper.TRIP_ROUTE_ID), this);
+//            }
+//
+//            //Call for calender values by serviceID
+//            if(!calenderProvider.containsKeyValue(dataObject.getString(DBHelper.TRIP_SERVICE_ID))) {
+////                APIAccess.getCalenderById(dataObject.getString(DBHelper.TRIP_SERVICE_ID), this);
+//            }
         }
         else if(tag == AtApiManager.TAG.getCalender){
             if(calenderProvider ==null){

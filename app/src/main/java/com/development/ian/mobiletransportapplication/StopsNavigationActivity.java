@@ -1,6 +1,7 @@
 package com.development.ian.mobiletransportapplication;
 
 import android.app.LoaderManager;
+import android.content.Context;
 import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Loader;
@@ -12,13 +13,16 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.CursorAdapter;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.development.ian.mobiletransportapplication.TransportContentProviders.SavedStopProvider;
 //import com.development.ian.mobiletransportapplication.TransportContentProviders.StationProvider;
 import com.development.ian.mobiletransportapplication.TransportContentProviders.StopProvider;
+import com.development.ian.mobiletransportapplication.TransportContentProviders.TripProvider;
 
 
 public class StopsNavigationActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
@@ -26,7 +30,11 @@ public class StopsNavigationActivity extends AppCompatActivity implements Loader
     private CursorAdapter cAdapter;
 //    private StationProvider stationProvider;
     private StopProvider stopProvider;
-    private SavedStopProvider savedStopProvider;
+//    private SavedStopProvider savedStopProvider;
+    private TripProvider tripProvider;
+
+    private static Window window ;
+    private static ProgressBar progressBar;
 
     public static final String STOP_NUMBER = "StopNumber";
     public static final String STOP_ADDRESS = "StopAddress";
@@ -37,6 +45,8 @@ public class StopsNavigationActivity extends AppCompatActivity implements Loader
         setContentView(R.layout.activity_stops_navigation);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        window = getWindow();
+        progressBar = (ProgressBar) findViewById(R.id.progressBar4);
         ListView list = (ListView) findViewById(R.id.stopList);
         stopProvider = new StopProvider();
         cAdapter = new StopsCursorAdapter(this, null, 0);
@@ -52,6 +62,21 @@ public class StopsNavigationActivity extends AppCompatActivity implements Loader
                 startActivity(intent);
             }
         });
+
+        tripProvider = new TripProvider();
+
+//        //setup database
+//        if(tripProvider.isEmpty()){
+//            //do db request
+//            RemoveUserControl();
+//            CompletedCounter counter = new CompletedCounter(3);
+//            Context c = getApplicationContext();
+//            AtApiManager APIAccess = new AtApiManager();
+//            APIResponseHandler responseHandler = new APIResponseHandler(findViewById(R.id.navigation_view), c, counter);
+//            APIAccess.getAllTrips(c, responseHandler);
+//            APIAccess.getAllRoutes(c, responseHandler);
+//            APIAccess.getAllCalenders(c, responseHandler);
+//        }
     }
 
     @Override
@@ -118,5 +143,33 @@ public class StopsNavigationActivity extends AppCompatActivity implements Loader
         intent.putExtra(STOP_NUMBER, stopNumber);
         intent.putExtra(STOP_ADDRESS, stopAddress);
         startActivity(intent);
+    }
+
+    private void RemoveUserControl() {
+        progressBar.setVisibility(View.VISIBLE);
+        window.addFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+    }
+
+    public static void restoreUserControl(){
+        window.clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+        progressBar.setVisibility(View.GONE);
+    }
+
+    public class CompletedCounter{
+        int count = 0;
+        int done;
+        public CompletedCounter(int x){
+            done = x;
+        }
+
+        public synchronized boolean CanRestoreUserControl(){
+            done++;
+            if(count == done){
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
     }
 }
