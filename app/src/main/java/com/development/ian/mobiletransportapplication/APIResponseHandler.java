@@ -1,5 +1,6 @@
 package com.development.ian.mobiletransportapplication;
 
+import android.content.AsyncQueryHandler;
 import android.content.ContentValues;
 import android.content.Context;
 import android.support.design.widget.Snackbar;
@@ -9,6 +10,7 @@ import android.widget.ListView;
 
 import com.development.ian.mobiletransportapplication.TransportContentProviders.ArrivalProvider;
 import com.development.ian.mobiletransportapplication.TransportContentProviders.CalenderProvider;
+import com.development.ian.mobiletransportapplication.TransportContentProviders.QueryHandler;
 import com.development.ian.mobiletransportapplication.TransportContentProviders.RouteProvider;
 import com.development.ian.mobiletransportapplication.TransportContentProviders.SavedStopProvider;
 import com.development.ian.mobiletransportapplication.TransportContentProviders.StopProvider;
@@ -86,7 +88,7 @@ public class APIResponseHandler implements ResponseHandler {
 
     @Override
     public void onSuccess(AtApiManager.TAG tag, JSONArray dataArray) throws JSONException { //todo handle exception rather than throwing
-        if(tag == AtApiManager.TAG.getStop){
+        if(tag == AtApiManager.TAG.getStop){ //todo move to other thread
             try {
                 //old
 //
@@ -120,9 +122,9 @@ public class APIResponseHandler implements ResponseHandler {
                 stopValues.put(DBHelper.STOP_PARENT, dataObject.getInt(DBHelper.STOP_PARENT));
                 stopProvider.insert(StopProvider.CONTENT_URI, stopValues);
 
-                if(!arrivalProvider.containsKeyValue(stopValues.get(DBHelper.STOP_ID).toString())) {
-                    APIAccess.getArrivalTimes(stopValues.get(DBHelper.STOP_ID).toString(), context, this);
-                }
+//                if(!arrivalProvider.containsKeyValue(stopValues.get(DBHelper.STOP_ID).toString())) {
+//                    APIAccess.getArrivalTimes(stopValues.get(DBHelper.STOP_ID).toString(), context, this);
+//                }
 
                 AddNewStopActivity.restoreUserControl();
                 Snackbar.make(view, "Stop " + stopValues.get(DBHelper.STOP_ID).toString() + " has been added", Snackbar.LENGTH_SHORT).show();
@@ -162,10 +164,14 @@ public class APIResponseHandler implements ResponseHandler {
                     routeValues.put(DBHelper.ROUTE_AGENCY_ID, dataObject.getString(DBHelper.ROUTE_AGENCY_ID));
                     routeValues.put(DBHelper.ROUTE_SHORT_NAME, dataObject.getString(DBHelper.ROUTE_SHORT_NAME));
                     routeValues.put(DBHelper.ROUTE_LONG_NAME, dataObject.getString(DBHelper.ROUTE_LONG_NAME));
-                    routeProvider.insert(RouteProvider.CONTENT_URI, routeValues);
+//                    routeProvider.insert(RouteProvider.CONTENT_URI, routeValues);
+
+                    AsyncQueryHandler queryHandler = new QueryHandler(context.getContentResolver());
+                    queryHandler.startInsert(i, null, RouteProvider.CONTENT_URI, routeValues);
+
                 }
                 if(counter.CanRestoreUserControl()){
-                    StopsNavigationActivity.restoreUserControl();
+                    StopsNavigationActivity.restoreUserControl(); //todo reconsider this approach
                 }
             }catch (JSONException e){
                 throw e;

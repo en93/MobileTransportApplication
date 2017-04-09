@@ -65,18 +65,18 @@ public class StopsNavigationActivity extends AppCompatActivity implements Loader
 
         tripProvider = new TripProvider();
 
-//        //setup database
-//        if(tripProvider.isEmpty()){
-//            //do db request
-//            RemoveUserControl();
-//            CompletedCounter counter = new CompletedCounter(3);
-//            Context c = getApplicationContext();
-//            AtApiManager APIAccess = new AtApiManager();
-//            APIResponseHandler responseHandler = new APIResponseHandler(findViewById(R.id.navigation_view), c, counter);
+        //setup database
+        if(tripProvider.isEmpty()){
+            //do db request
+            RemoveUserControl();
+            CompletedCounter counter = new CompletedCounter(1); //todo change back to three once testing completed
+            Context c = getApplicationContext();
+            AtApiManager APIAccess = new AtApiManager();
+            APIResponseHandler responseHandler = new APIResponseHandler(findViewById(R.id.navigation_view), c, counter);
 //            APIAccess.getAllTrips(c, responseHandler);
-//            APIAccess.getAllRoutes(c, responseHandler);
+            APIAccess.getAllRoutes(c, responseHandler);
 //            APIAccess.getAllCalenders(c, responseHandler);
-//        }
+        }
     }
 
     @Override
@@ -163,7 +163,7 @@ public class StopsNavigationActivity extends AppCompatActivity implements Loader
         }
 
         public synchronized boolean CanRestoreUserControl(){
-            done++;
+            count++;
             if(count == done){
                 return true;
             }

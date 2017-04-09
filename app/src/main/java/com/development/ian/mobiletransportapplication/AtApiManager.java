@@ -12,10 +12,12 @@ import com.android.volley.toolbox.HurlStack;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.development.ian.mobiletransportapplication.TransportContentProviders.ArrivalProvider;
 import com.development.ian.mobiletransportapplication.TransportContentProviders.CalenderProvider;
+import com.development.ian.mobiletransportapplication.TransportContentProviders.QueryHandler;
 import com.development.ian.mobiletransportapplication.TransportContentProviders.RouteProvider;
 import com.development.ian.mobiletransportapplication.TransportContentProviders.TripProvider;
 //import com.development.ian.mobiletransportapplication.TransportContentProviders.StationProvider;
 
+import android.content.AsyncQueryHandler;
 import android.content.Context;
 
 import org.json.JSONArray;
@@ -104,7 +106,7 @@ public class AtApiManager {
         requestQueue.add(jsonRequest);
     }
 
-    public void getAllRoutes(Context context, final APIResponseHandler responseHandler){ //todo write handling of response and initial call to this
+    public void getAllRoutes(final Context context, final APIResponseHandler responseHandler){ //todo write handling of response and initial call to this
 
 //        ArrivalProvider.requestedButNotCompleted.add(Integer.parseInt(id));
         ConfirmQueueRunning(context);
@@ -122,6 +124,9 @@ public class AtApiManager {
                 } catch (JSONException e) {
                     responseHandler.onFailure(REQUEST_TAG,e.getMessage(), e);
                 }
+
+
+
 //                finally {
 //                    updateCallNumbers(-1);
 //                    ArrivalProvider.requestedButNotCompleted.remove(new Integer(Integer.parseInt(id)));
