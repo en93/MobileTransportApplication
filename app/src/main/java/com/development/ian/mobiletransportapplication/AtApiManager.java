@@ -45,8 +45,8 @@ public class AtApiManager {
 
     private static AtApiManager APIAccess = new AtApiManager();
 
-    private final String SUBKEYLABEL = "Ocp-Apim-Subscription-Key";
-    private final String KEY = "c9c8bfee133f4646a9c92c7dcb7229a9";
+    public final static String SUBKEYLABEL = "Ocp-Apim-Subscription-Key";
+    public final static String KEY = "c9c8bfee133f4646a9c92c7dcb7229a9";
 //    private StationProvider stationProvider= new StationProvider();
 
     static Cache cache;

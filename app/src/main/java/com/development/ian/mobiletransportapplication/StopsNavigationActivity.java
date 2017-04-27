@@ -1,11 +1,13 @@
 package com.development.ian.mobiletransportapplication;
 
+import android.app.DownloadManager;
 import android.app.LoaderManager;
 import android.content.Context;
 import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
@@ -71,9 +73,34 @@ public class StopsNavigationActivity extends AppCompatActivity implements Loader
             RemoveUserControl();
             CompletedCounter counter = new CompletedCounter(1); //todo change back to three once testing completed
             Context c = getApplicationContext();
-            AtApiManager APIAccess = new AtApiManager();
-            APIResponseHandler responseHandler = new APIResponseHandler(findViewById(R.id.navigation_view), c, counter);
-            APIAccess.getAllTrips(c, responseHandler);                //todo consider using download manager as these files are large and
+
+            DownloadManager dm = (DownloadManager) getSystemService(DOWNLOAD_SERVICE);
+
+            DownloadManager.Request request1 = new DownloadManager.Request(Uri.parse(AtApiManager.REQUEST_TRIPS_ALL_URL));
+            request1.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE); //todo make hidden
+            request1.setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI | DownloadManager.Request.NETWORK_MOBILE);
+            request1.addRequestHeader(AtApiManager.SUBKEYLABEL, AtApiManager.KEY);
+            request1.setTitle("Trips");
+            long r1 = dm.enqueue(request1);
+
+            DownloadManager.Request request2 = new DownloadManager.Request(Uri.parse(AtApiManager.REQUEST_CALENDER_ALL_URL));
+            request2.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE); //todo make hidden
+            request2.setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI | DownloadManager.Request.NETWORK_MOBILE);
+            request2.addRequestHeader(AtApiManager.SUBKEYLABEL, AtApiManager.KEY);
+            request2.setTitle("Calender");
+            long r2 = dm.enqueue(request2);
+
+            DownloadManager.Request request3 = new DownloadManager.Request(Uri.parse(AtApiManager.REQUEST_ROUTES_ALL_URL));
+            request3.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE); //todo make hidden
+            request3.setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI | DownloadManager.Request.NETWORK_MOBILE);
+            request3.addRequestHeader(AtApiManager.SUBKEYLABEL, AtApiManager.KEY);
+            request3.setTitle("Routes");
+            long r3 = dm.enqueue(request3);
+
+
+//            AtApiManager APIAccess = new AtApiManager();
+//            APIResponseHandler responseHandler = new APIResponseHandler(findViewById(R.id.navigation_view), c, counter);
+//            APIAccess.getAllTrips(c, responseHandler);                //todo consider using download manager as these files are large and
 //            APIAccess.getAllRoutes(c, responseHandler);
 //            APIAccess.getAllCalenders(c, responseHandler);
         }
