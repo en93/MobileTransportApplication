@@ -73,7 +73,7 @@ public class StopsNavigationActivity extends AppCompatActivity implements Loader
         if(tripProvider.isEmpty()){
             //do db request
             RemoveUserControl();
-            CompletedCounter counter = new CompletedCounter(1); //todo change back to three once testing completed
+            CompletedCounter counter = new CompletedCounter(3); //todo change back to three once testing completed
             Context c = getApplicationContext();
 
 //            //Use to make sure you access the right file
@@ -114,8 +114,9 @@ public class StopsNavigationActivity extends AppCompatActivity implements Loader
             AtApiManager APIAccess = new AtApiManager();
             APIResponseHandler responseHandler = new APIResponseHandler(findViewById(R.id.navigation_view), c, counter);
             APIAccess.getAllTrips(c, responseHandler);                //todo consider using download manager as these files are large and
-//            APIAccess.getAllRoutes(c, responseHandler);
-//            APIAccess.getAllCalenders(c, responseHandler);
+            APIAccess.getAllRoutes(c, responseHandler);
+            APIAccess.getAllCalenders(c, responseHandler);
+            //todo handle failure better
         }
     }
 
@@ -204,12 +205,7 @@ public class StopsNavigationActivity extends AppCompatActivity implements Loader
 
         public synchronized boolean CanRestoreUserControl(){
             count++;
-            if(count == done){
-                return true;
-            }
-            else {
-                return false;
-            }
+            return (count == done);
         }
     }
 }

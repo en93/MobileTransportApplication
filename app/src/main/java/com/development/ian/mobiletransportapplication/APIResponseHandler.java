@@ -159,6 +159,11 @@ public class APIResponseHandler implements ResponseHandler {
             try {
                 JSONObject dataObject;
                 AsyncQueryHandler queryHandler = new QueryHandler(context.getContentResolver());
+
+                AsyncJsonParser parser = new AsyncJsonParser(queryHandler, dataArray, tag);
+                parser.execute();
+
+                /*
                 for (int i = 0; i<dataArray.length(); i++) {
                     dataObject = dataArray.getJSONObject(i);
                     ContentValues routeValues = new ContentValues();
@@ -175,7 +180,9 @@ public class APIResponseHandler implements ResponseHandler {
                 if(counter.CanRestoreUserControl()){
                     StopsNavigationActivity.restoreUserControl(); //todo reconsider this approach
                 }
-            }catch (JSONException e){
+
+                */
+            }catch (Exception e){
                 throw e;
             }
         }
@@ -183,6 +190,11 @@ public class APIResponseHandler implements ResponseHandler {
             try {
                 JSONObject dataObject;
                 AsyncQueryHandler queryHandler = new QueryHandler(context.getContentResolver());
+
+                AsyncJsonParser parser = new AsyncJsonParser(queryHandler, dataArray, tag);
+                parser.execute();
+
+                /*
                 for (int i = 0; i<dataArray.length(); i++) {
                     dataObject = dataArray.getJSONObject(i);
                     ContentValues calenderValues = new ContentValues();
@@ -202,7 +214,8 @@ public class APIResponseHandler implements ResponseHandler {
                 if(counter.CanRestoreUserControl()){
                     StopsNavigationActivity.restoreUserControl();
                 }
-            }catch (JSONException e){
+                */
+            }catch (Exception e){
                 throw e;
             }
         }
@@ -239,24 +252,31 @@ public class APIResponseHandler implements ResponseHandler {
 //                APIAccess.getCalenderById(dataObject.getString(DBHelper.TRIP_SERVICE_ID), this);
             }
         }
+
+        /* TODO testing async here*/
         else if(tag == AtApiManager.TAG.getTripAll){
 //            JSONObject dataObject = dataArray.getJSONObject(0);
             AsyncQueryHandler queryHandler = new QueryHandler(context.getContentResolver());
-            JSONObject dataObject;
-            for (int i = 0; i< dataArray.length(); i++) {
-                dataObject = dataArray.getJSONObject(i);
-                ContentValues tripValues = new ContentValues();
-                tripValues.put(DBHelper.TRIP_ID, dataObject.getString(DBHelper.TRIP_ID));
-                tripValues.put(DBHelper.TRIP_ROUTE_ID, dataObject.getString(DBHelper.TRIP_ROUTE_ID));
-                tripValues.put(DBHelper.TRIP_HEADSIGN, dataObject.getString(DBHelper.TRIP_HEADSIGN));
-                tripValues.put(DBHelper.TRIP_DIRECTION, dataObject.getString(DBHelper.TRIP_DIRECTION));
-                tripValues.put(DBHelper.TRIP_SERVICE_ID, dataObject.getString(DBHelper.TRIP_SERVICE_ID));
-//                tripProvider.insert(TripProvider.CONTENT_URI, tripValues);
-                queryHandler.startInsert(i, null, TripProvider.CONTENT_URI, tripValues);
-            }
-            if(counter.CanRestoreUserControl()){
-                StopsNavigationActivity.restoreUserControl();
-            }
+
+            AsyncJsonParser parser = new AsyncJsonParser(queryHandler, dataArray, tag);
+            parser.execute();
+
+//            JSONObject dataObject;
+//            for (int i = 0; i< dataArray.length(); i++) {
+//                dataObject = dataArray.getJSONObject(i);
+//                ContentValues tripValues = new ContentValues();
+//                tripValues.put(DBHelper.TRIP_ID, dataObject.getString(DBHelper.TRIP_ID));
+//                tripValues.put(DBHelper.TRIP_ROUTE_ID, dataObject.getString(DBHelper.TRIP_ROUTE_ID));
+//                tripValues.put(DBHelper.TRIP_HEADSIGN, dataObject.getString(DBHelper.TRIP_HEADSIGN));
+//                tripValues.put(DBHelper.TRIP_DIRECTION, dataObject.getString(DBHelper.TRIP_DIRECTION));
+//                tripValues.put(DBHelper.TRIP_SERVICE_ID, dataObject.getString(DBHelper.TRIP_SERVICE_ID));
+//                queryHandler.startInsert(i, null, TripProvider.CONTENT_URI, tripValues);
+//            }
+//            if(counter.CanRestoreUserControl()){
+//                StopsNavigationActivity.restoreUserControl();
+//            }
+        //todo end testing
+
 
             //Call for route values using routeID
 //            if(!routeProvider.containsKeyValue(dataObject.getString(DBHelper.TRIP_ROUTE_ID))) {
@@ -310,21 +330,89 @@ public class APIResponseHandler implements ResponseHandler {
 
         AsyncQueryHandler queryHandler;
         JSONArray dataArray;
+        AtApiManager.TAG tag;
 
-        AsyncJsonParser(AsyncQueryHandler a, JSONArray j){
+        AsyncJsonParser(AsyncQueryHandler a, JSONArray j, AtApiManager.TAG t){
             queryHandler = a;
             dataArray = j;
+            tag = t;
         }
 
         @Override
         protected Void doInBackground(Void... voids) {
+            //todo use switch to decide method to use to create
+            try {
+                if (tag == AtApiManager.TAG.getTripAll) {
+                    parseTrips();
+                }else if(tag == AtApiManager.TAG.getRouteAll){
+                    parseRoute();
+                }else if(tag == AtApiManager.TAG.getCalenderAll){
+                    parseCalender();
+                }
+            }catch (JSONException e){                //todo handle
+
+            }
             return null;
+        }
+
+        private void parseRoute() throws JSONException {
+            JSONObject dataObject;
+            ContentValues calenderValues;
+            for (int i = 0; i<dataArray.length(); i++) {
+                dataObject = dataArray.getJSONObject(i);
+                ContentValues routeValues = new ContentValues();
+                routeValues.put(DBHelper.ROUTE_ID, dataObject.getString(DBHelper.ROUTE_ID));
+                routeValues.put(DBHelper.ROUTE_AGENCY_ID, dataObject.getString(DBHelper.ROUTE_AGENCY_ID));
+                routeValues.put(DBHelper.ROUTE_SHORT_NAME, dataObject.getString(DBHelper.ROUTE_SHORT_NAME));
+                routeValues.put(DBHelper.ROUTE_LONG_NAME, dataObject.getString(DBHelper.ROUTE_LONG_NAME));
+                queryHandler.startInsert(i, null, RouteProvider.CONTENT_URI, routeValues);
+            }
+        }
+
+        private void parseCalender() throws JSONException {
+            JSONObject dataObject;
+            ContentValues calenderValues;
+            for (int i = 0; i<dataArray.length(); i++) {
+                dataObject = dataArray.getJSONObject(i);
+                calenderValues = new ContentValues();
+                calenderValues.put(DBHelper.CALENDER_SERVICE_ID, dataObject.getString(DBHelper.CALENDER_SERVICE_ID));
+                calenderValues.put(DBHelper.CALENDER_MONDAY, dataObject.getInt(DBHelper.CALENDER_MONDAY));
+                calenderValues.put(DBHelper.CALENDER__TUESDAY, dataObject.getInt(DBHelper.CALENDER__TUESDAY));
+                calenderValues.put(DBHelper.CALENDER_WEDNESDAY, dataObject.getInt(DBHelper.CALENDER_WEDNESDAY));
+                calenderValues.put(DBHelper.CALENDER_THURSDAY, dataObject.getInt(DBHelper.CALENDER_THURSDAY));
+                calenderValues.put(DBHelper.CALENDER_FRIDAY, dataObject.getInt(DBHelper.CALENDER_FRIDAY));
+                calenderValues.put(DBHelper.CALENDER_SATURDAY, dataObject.getInt(DBHelper.CALENDER_SATURDAY));
+                calenderValues.put(DBHelper.CALENDER_SUNDAY, dataObject.getInt(DBHelper.CALENDER_SUNDAY));
+                calenderValues.put(DBHelper.CALENDER_START, dataObject.getString(DBHelper.CALENDER_START));
+                calenderValues.put(DBHelper.CALENDER_END, dataObject.getString(DBHelper.CALENDER_END));
+                queryHandler.startInsert(i, null, CalenderProvider.CONTENT_URI, calenderValues);
+            }
+        }
+
+        private void parseTrips() throws JSONException {
+            JSONObject dataObject;
+            ContentValues tripValues;
+            for (int i = 0; i< dataArray.length(); i++) {
+                dataObject = dataArray.getJSONObject(i);
+                tripValues = new ContentValues();
+                tripValues.put(DBHelper.TRIP_ID, dataObject.getString(DBHelper.TRIP_ID));
+                tripValues.put(DBHelper.TRIP_ROUTE_ID, dataObject.getString(DBHelper.TRIP_ROUTE_ID));
+                tripValues.put(DBHelper.TRIP_HEADSIGN, dataObject.getString(DBHelper.TRIP_HEADSIGN));
+                tripValues.put(DBHelper.TRIP_DIRECTION, dataObject.getString(DBHelper.TRIP_DIRECTION));
+                tripValues.put(DBHelper.TRIP_SERVICE_ID, dataObject.getString(DBHelper.TRIP_SERVICE_ID));
+                queryHandler.startInsert(i, null, TripProvider.CONTENT_URI, tripValues);
+            }
         }
 
         @Override
         protected void onPostExecute(Void v){
-
+            if(counter.CanRestoreUserControl()){
+                StopsNavigationActivity.restoreUserControl();
+            }
         }
     }
+
+    //todo takes long time to parse, can it be sped up?
+    //todo feedback on what stage it is at
 
 }

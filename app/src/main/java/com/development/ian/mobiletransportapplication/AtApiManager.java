@@ -452,3 +452,4 @@ public class AtApiManager {
     public enum TAG{getStop, getArrivals, getRoute, getCalender, getVersion, getTrip, getTripAll, getRouteAll, getCalenderAll}
 }
 
+//todo detect and handle timeouts
