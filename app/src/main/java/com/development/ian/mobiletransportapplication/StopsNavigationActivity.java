@@ -9,6 +9,7 @@ import android.content.Loader;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -75,41 +76,44 @@ public class StopsNavigationActivity extends AppCompatActivity implements Loader
             CompletedCounter counter = new CompletedCounter(1); //todo change back to three once testing completed
             Context c = getApplicationContext();
 
-            //Use to make sure you access the right file
-            Calendar calender = Calendar.getInstance();
-            String seconds = ""+calender.get(Calendar.SECOND)+"_" + calender.get(Calendar.MINUTE)+"_"+ calender.get(Calendar.HOUR)+"_" +calender.get(Calendar.DAY_OF_YEAR)+"_"+calender.get(Calendar.YEAR);
+//            //Use to make sure you access the right file
+//            Calendar calender = Calendar.getInstance();
+//            String seconds = ""+calender.get(Calendar.SECOND)+"_" + calender.get(Calendar.MINUTE)+"_"+ calender.get(Calendar.HOUR)+"_" +calender.get(Calendar.DAY_OF_YEAR)+"_"+calender.get(Calendar.YEAR);
+//
+//            DownloadManager dm = (DownloadManager) getSystemService(DOWNLOAD_SERVICE);
+//
+//            DownloadManager.Request request1 = new DownloadManager.Request(Uri.parse(AtApiManager.REQUEST_TRIPS_ALL_URL));
+//            request1.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE); //todo make hidden
+//            request1.setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI | DownloadManager.Request.NETWORK_MOBILE);
+//            request1.addRequestHeader(AtApiManager.SUBKEYLABEL, AtApiManager.KEY);
+//            request1.setTitle("Trips" + seconds+".json");
+//            long r1 = dm.enqueue(request1);
+//
+//            DownloadManager.Request request2 = new DownloadManager.Request(Uri.parse(AtApiManager.REQUEST_CALENDER_ALL_URL));
+//            request2.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE); //todo make hidden
+//            request2.setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI | DownloadManager.Request.NETWORK_MOBILE);
+//            request2.addRequestHeader(AtApiManager.SUBKEYLABEL, AtApiManager.KEY);
+//            request2.setTitle("Calender"+ seconds+".json");
+//            long r2 = dm.enqueue(request2);
+//
+//            DownloadManager.Request request3 = new DownloadManager.Request(Uri.parse(AtApiManager.REQUEST_ROUTES_ALL_URL));
+//            request3.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE); //todo make hidden
+//            request3.setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI | DownloadManager.Request.NETWORK_MOBILE);
+//            request3.addRequestHeader(AtApiManager.SUBKEYLABEL, AtApiManager.KEY);
+//            request3.setTitle("Routes"+ seconds+".json");
+//            long r3 = dm.enqueue(request3);
+//
+//            //todo listen for completion and start adding to db
+//            //todo once all 3 done release control
+//            //todo addmethod to stop download
+//
+//            Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
 
-            DownloadManager dm = (DownloadManager) getSystemService(DOWNLOAD_SERVICE);
-
-            DownloadManager.Request request1 = new DownloadManager.Request(Uri.parse(AtApiManager.REQUEST_TRIPS_ALL_URL));
-            request1.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE); //todo make hidden
-            request1.setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI | DownloadManager.Request.NETWORK_MOBILE);
-            request1.addRequestHeader(AtApiManager.SUBKEYLABEL, AtApiManager.KEY);
-            request1.setTitle("Trips" + seconds+".json");
-            long r1 = dm.enqueue(request1);
-
-            DownloadManager.Request request2 = new DownloadManager.Request(Uri.parse(AtApiManager.REQUEST_CALENDER_ALL_URL));
-            request2.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE); //todo make hidden
-            request2.setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI | DownloadManager.Request.NETWORK_MOBILE);
-            request2.addRequestHeader(AtApiManager.SUBKEYLABEL, AtApiManager.KEY);
-            request2.setTitle("Calender"+ seconds+".json");
-            long r2 = dm.enqueue(request2);
-
-            DownloadManager.Request request3 = new DownloadManager.Request(Uri.parse(AtApiManager.REQUEST_ROUTES_ALL_URL));
-            request3.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE); //todo make hidden
-            request3.setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI | DownloadManager.Request.NETWORK_MOBILE);
-            request3.addRequestHeader(AtApiManager.SUBKEYLABEL, AtApiManager.KEY);
-            request3.setTitle("Routes"+ seconds+".json");
-            long r3 = dm.enqueue(request3);
-
-            //todo listen for completion and start adding to db
-            //todo once all 3 done release control
-            //todo addmethod to stop download
 
 
-//            AtApiManager APIAccess = new AtApiManager();
-//            APIResponseHandler responseHandler = new APIResponseHandler(findViewById(R.id.navigation_view), c, counter);
-//            APIAccess.getAllTrips(c, responseHandler);                //todo consider using download manager as these files are large and
+            AtApiManager APIAccess = new AtApiManager();
+            APIResponseHandler responseHandler = new APIResponseHandler(findViewById(R.id.navigation_view), c, counter);
+            APIAccess.getAllTrips(c, responseHandler);                //todo consider using download manager as these files are large and
 //            APIAccess.getAllRoutes(c, responseHandler);
 //            APIAccess.getAllCalenders(c, responseHandler);
         }

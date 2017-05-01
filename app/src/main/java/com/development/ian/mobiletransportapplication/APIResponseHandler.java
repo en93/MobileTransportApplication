@@ -3,6 +3,7 @@ package com.development.ian.mobiletransportapplication;
 import android.content.AsyncQueryHandler;
 import android.content.ContentValues;
 import android.content.Context;
+import android.os.AsyncTask;
 import android.support.design.widget.Snackbar;
 import android.util.Log;
 import android.view.View;
@@ -302,6 +303,27 @@ public class APIResponseHandler implements ResponseHandler {
         @Override
         public int compare(BusArrival t1, BusArrival t2) {
             return Integer.compare(t1.getArrivalSeconds(), t2.getArrivalSeconds());
+        }
+    }
+
+    class AsyncJsonParser extends AsyncTask<Void, Void, Void>{
+
+        AsyncQueryHandler queryHandler;
+        JSONArray dataArray;
+
+        AsyncJsonParser(AsyncQueryHandler a, JSONArray j){
+            queryHandler = a;
+            dataArray = j;
+        }
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void v){
+
         }
     }
 

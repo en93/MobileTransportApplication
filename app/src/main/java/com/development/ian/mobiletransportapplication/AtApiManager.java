@@ -1,6 +1,7 @@
 package com.development.ian.mobiletransportapplication;
 import com.android.volley.AuthFailureError;
 import com.android.volley.Cache;
+import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Network;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -19,6 +20,8 @@ import com.development.ian.mobiletransportapplication.TransportContentProviders.
 
 import android.content.AsyncQueryHandler;
 import android.content.Context;
+import android.os.Debug;
+import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -92,7 +95,9 @@ public class AtApiManager {
             }
         }, new Response.ErrorListener() {
             @Override
-            public void onErrorResponse(VolleyError error) {}
+            public void onErrorResponse(VolleyError error) {
+                Log.e("Volley_Error", error.getMessage());
+            }
         }){
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError{
@@ -101,6 +106,10 @@ public class AtApiManager {
                 return headers;
             }
         };
+        int timeout = 180000;
+        jsonRequest.setRetryPolicy(new DefaultRetryPolicy(
+                timeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT
+        ));
         jsonRequest.setTag(REQUEST_TAG);
 //        updateCallNumbers(1); //todo remove
         requestQueue.add(jsonRequest);
@@ -143,6 +152,10 @@ public class AtApiManager {
                 return headers;
             }
         };
+        int timeout = 180000;
+        jsonRequest.setRetryPolicy(new DefaultRetryPolicy(
+                timeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT
+        ));
         jsonRequest.setTag(REQUEST_TAG);
 //        updateCallNumbers(1); //todo remove
         requestQueue.add(jsonRequest);
@@ -178,6 +191,10 @@ public class AtApiManager {
                 return headers;
             }
         };
+        int timeout = 180000;
+        jsonRequest.setRetryPolicy(new DefaultRetryPolicy(
+                timeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT
+        ));
         jsonRequest.setTag(REQUEST_TAG);
         requestQueue.add(jsonRequest);
     }
