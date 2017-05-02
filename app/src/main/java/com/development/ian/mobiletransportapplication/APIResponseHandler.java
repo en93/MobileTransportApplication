@@ -3,6 +3,9 @@ package com.development.ian.mobiletransportapplication;
 import android.content.AsyncQueryHandler;
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteException;
+import android.database.sqlite.SQLiteStatement;
 import android.os.AsyncTask;
 import android.support.design.widget.Snackbar;
 import android.util.Log;
@@ -331,11 +334,13 @@ public class APIResponseHandler implements ResponseHandler {
         AsyncQueryHandler queryHandler;
         JSONArray dataArray;
         AtApiManager.TAG tag;
+        SQLiteDatabase db;
 
         AsyncJsonParser(AsyncQueryHandler a, JSONArray j, AtApiManager.TAG t){
             queryHandler = a;
             dataArray = j;
             tag = t;
+            db = DBHelper.getInstance(context).getWritableDatabase();
         }
 
         @Override
@@ -359,23 +364,57 @@ public class APIResponseHandler implements ResponseHandler {
 
         private void parseRoute() throws JSONException {
             JSONObject dataObject;
-            ContentValues routeValues;
-            for (int i = 0; i<dataArray.length(); i++) {
-                dataObject = dataArray.getJSONObject(i);
-                routeValues = new ContentValues();
-                routeValues.put(DBHelper.ROUTE_ID, dataObject.getString(DBHelper.ROUTE_ID));
-                routeValues.put(DBHelper.ROUTE_AGENCY_ID, dataObject.getString(DBHelper.ROUTE_AGENCY_ID));
-                routeValues.put(DBHelper.ROUTE_SHORT_NAME, dataObject.getString(DBHelper.ROUTE_SHORT_NAME));
-                routeValues.put(DBHelper.ROUTE_LONG_NAME, dataObject.getString(DBHelper.ROUTE_LONG_NAME));
+//            ContentValues routeValues;
+//            ContentValues[] values = new ContentValues[dataArray.length()];
+
+            String sqlInsert = String.format("INSERT INTO %s (%s, %s, %s, %s) VALUES (?,?,?,?);",
+                    DBHelper.ROUTE_TABLE, DBHelper.ROUTE_ID, DBHelper.ROUTE_AGENCY_ID, DBHelper.ROUTE_SHORT_NAME, DBHelper.ROUTE_LONG_NAME);
+            SQLiteStatement statement = db.compileStatement(sqlInsert);
+
+            db.beginTransaction();
+            for (int i = 0; i < dataArray.length(); i++) {
+
+            /* //works but is too slow
+            dataObject = dataArray.getJSONObject(i);
+            routeValues = new ContentValues();
+            routeValues.put(DBHelper.ROUTE_ID, dataObject.getString(DBHelper.ROUTE_ID));
+            routeValues.put(DBHelper.ROUTE_AGENCY_ID, dataObject.getString(DBHelper.ROUTE_AGENCY_ID));
+            routeValues.put(DBHelper.ROUTE_SHORT_NAME, dataObject.getString(DBHelper.ROUTE_SHORT_NAME));
+            routeValues.put(DBHelper.ROUTE_LONG_NAME, dataObject.getString(DBHelper.ROUTE_LONG_NAME));
 //                queryHandler.startInsert(i, null, RouteProvider.CONTENT_URI, routeValues);
-                routeProvider.insert(RouteProvider.CONTENT_URI, routeValues);
+//                routeProvider.insert(RouteProvider.CONTENT_URI, routeValues);
+*/
+                dataObject = dataArray.getJSONObject(i);
+                statement.clearBindings();
+                statement.bindString(1, dataObject.getString(DBHelper.ROUTE_ID));
+                statement.bindString(2, dataObject.getString(DBHelper.ROUTE_AGENCY_ID));
+                statement.bindString(3, dataObject.getString(DBHelper.ROUTE_SHORT_NAME));
+                statement.bindString(4, dataObject.getString(DBHelper.ROUTE_LONG_NAME));
+                statement.execute();
+
+//                values[i] = routeValues;
             }
+
+            db.setTransactionSuccessful();
+            db.endTransaction();
+//            context.getContentResolver().bulkInsert(RouteProvider.CONTENT_URI,values);
         }
 
         private void parseCalender() throws JSONException {
             JSONObject dataObject;
-            ContentValues calenderValues;
+//            ContentValues calenderValues;
+//            ContentValues[] values = new ContentValues[dataArray.length()];
+
+            String sqlInsert = String.format("INSERT INTO %s (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s) VALUES (?,?,?,?,?,?,?,?,?,?);",
+                    DBHelper.CALENDER_TABLE, DBHelper.CALENDER_SERVICE_ID, DBHelper.CALENDER_MONDAY,
+                    DBHelper.CALENDER__TUESDAY, DBHelper.CALENDER_WEDNESDAY, DBHelper.CALENDER_THURSDAY,
+                    DBHelper.CALENDER_FRIDAY, DBHelper.CALENDER_SATURDAY, DBHelper.CALENDER_SUNDAY,
+                    DBHelper.CALENDER_START, DBHelper.CALENDER_END);
+            SQLiteStatement statement = db.compileStatement(sqlInsert);
+
+            db.beginTransaction();
             for (int i = 0; i<dataArray.length(); i++) {
+                /*
                 dataObject = dataArray.getJSONObject(i);
                 calenderValues = new ContentValues();
                 calenderValues.put(DBHelper.CALENDER_SERVICE_ID, dataObject.getString(DBHelper.CALENDER_SERVICE_ID));
@@ -389,15 +428,40 @@ public class APIResponseHandler implements ResponseHandler {
                 calenderValues.put(DBHelper.CALENDER_START, dataObject.getString(DBHelper.CALENDER_START));
                 calenderValues.put(DBHelper.CALENDER_END, dataObject.getString(DBHelper.CALENDER_END));
 //                queryHandler.startInsert(i, null, CalenderProvider.CONTENT_URI, calenderValues);
-                calenderProvider.insert(CalenderProvider.CONTENT_URI, calenderValues);
+//                calenderProvider.insert(CalenderProvider.CONTENT_URI, calenderValues);
+//                values[i] = calenderValues;
+*/
+                dataObject = dataArray.getJSONObject(i);
+                statement.clearBindings();
+                statement.bindString(1, dataObject.getString(DBHelper.CALENDER_SERVICE_ID));
+                statement.bindLong(2, dataObject.getInt(DBHelper.CALENDER_MONDAY));
+                statement.bindLong(3, dataObject.getInt(DBHelper.CALENDER__TUESDAY));
+                statement.bindLong(4, dataObject.getInt(DBHelper.CALENDER_WEDNESDAY));
+                statement.bindLong(5, dataObject.getInt(DBHelper.CALENDER_THURSDAY));
+                statement.bindLong(6, dataObject.getInt(DBHelper.CALENDER_FRIDAY));
+                statement.bindLong(7, dataObject.getInt(DBHelper.CALENDER_SATURDAY));
+                statement.bindLong(8, dataObject.getInt(DBHelper.CALENDER_SUNDAY));
+                statement.bindString(9, dataObject.getString(DBHelper.CALENDER_START));
+                statement.bindString(10, dataObject.getString(DBHelper.CALENDER_END));
+                statement.execute();
             }
+            db.setTransactionSuccessful();
+            db.endTransaction();
+//            context.getContentResolver().bulkInsert(CalenderProvider.CONTENT_URI, values);
         }
 
         private void parseTrips() throws JSONException {
             JSONObject dataObject;
-            ContentValues tripValues;
+//            ContentValues tripValues;
+
+            String sqlInsert = String.format("INSERT INTO %s (%s, %s, %s, %s, %s) VALUES (?,?,?,?,?);",
+                    DBHelper.TRIP_TABLE, DBHelper.TRIP_ROUTE_ID, DBHelper.TRIP_SERVICE_ID, DBHelper.TRIP_ID, DBHelper.TRIP_HEADSIGN, DBHelper.TRIP_DIRECTION);
+            SQLiteStatement statement = db.compileStatement(sqlInsert);
+
+//            ContentValues[] values = new ContentValues[dataArray.length()];
+            db.beginTransaction();
             for (int i = 0; i< dataArray.length(); i++) {
-                dataObject = dataArray.getJSONObject(i);
+             /*   dataObject = dataArray.getJSONObject(i);
                 tripValues = new ContentValues();
                 tripValues.put(DBHelper.TRIP_ID, dataObject.getString(DBHelper.TRIP_ID));
                 tripValues.put(DBHelper.TRIP_ROUTE_ID, dataObject.getString(DBHelper.TRIP_ROUTE_ID));
@@ -405,8 +469,22 @@ public class APIResponseHandler implements ResponseHandler {
                 tripValues.put(DBHelper.TRIP_DIRECTION, dataObject.getString(DBHelper.TRIP_DIRECTION));
                 tripValues.put(DBHelper.TRIP_SERVICE_ID, dataObject.getString(DBHelper.TRIP_SERVICE_ID));
 //                queryHandler.startInsert(i, null, TripProvider.CONTENT_URI, tripValues);
-                tripProvider.insert(TripProvider.CONTENT_URI, tripValues);
+//                tripProvider.insert(TripProvider.CONTENT_URI, tripValues);
+//                values[i] = tripValues;
+*/
+                dataObject = dataArray.getJSONObject(i);
+                statement.clearBindings();
+                statement.bindString(1, dataObject.getString(DBHelper.TRIP_ROUTE_ID));
+                statement.bindString(2, dataObject.getString(DBHelper.TRIP_SERVICE_ID));
+                statement.bindString(3, dataObject.getString(DBHelper.TRIP_ID));
+                statement.bindString(4, dataObject.getString(DBHelper.TRIP_HEADSIGN));
+                statement.bindString(5, dataObject.getString(DBHelper.TRIP_DIRECTION));
+                statement.execute();
+
             }
+            db.setTransactionSuccessful();
+            db.endTransaction();
+//            context.getContentResolver().bulkInsert(TripProvider.CONTENT_URI,values);
         }
 
         @Override
