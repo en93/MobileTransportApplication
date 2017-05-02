@@ -350,22 +350,25 @@ public class APIResponseHandler implements ResponseHandler {
                     parseCalender();
                 }
             }catch (JSONException e){                //todo handle
-
+                Log.e("JSON_Exception", e.getMessage());
+            }catch (Exception e){                //todo handle
+                Log.e("Other_exception", e.getMessage());
             }
             return null;
         }
 
         private void parseRoute() throws JSONException {
             JSONObject dataObject;
-            ContentValues calenderValues;
+            ContentValues routeValues;
             for (int i = 0; i<dataArray.length(); i++) {
                 dataObject = dataArray.getJSONObject(i);
-                ContentValues routeValues = new ContentValues();
+                routeValues = new ContentValues();
                 routeValues.put(DBHelper.ROUTE_ID, dataObject.getString(DBHelper.ROUTE_ID));
                 routeValues.put(DBHelper.ROUTE_AGENCY_ID, dataObject.getString(DBHelper.ROUTE_AGENCY_ID));
                 routeValues.put(DBHelper.ROUTE_SHORT_NAME, dataObject.getString(DBHelper.ROUTE_SHORT_NAME));
                 routeValues.put(DBHelper.ROUTE_LONG_NAME, dataObject.getString(DBHelper.ROUTE_LONG_NAME));
-                queryHandler.startInsert(i, null, RouteProvider.CONTENT_URI, routeValues);
+//                queryHandler.startInsert(i, null, RouteProvider.CONTENT_URI, routeValues);
+                routeProvider.insert(RouteProvider.CONTENT_URI, routeValues);
             }
         }
 
@@ -385,7 +388,8 @@ public class APIResponseHandler implements ResponseHandler {
                 calenderValues.put(DBHelper.CALENDER_SUNDAY, dataObject.getInt(DBHelper.CALENDER_SUNDAY));
                 calenderValues.put(DBHelper.CALENDER_START, dataObject.getString(DBHelper.CALENDER_START));
                 calenderValues.put(DBHelper.CALENDER_END, dataObject.getString(DBHelper.CALENDER_END));
-                queryHandler.startInsert(i, null, CalenderProvider.CONTENT_URI, calenderValues);
+//                queryHandler.startInsert(i, null, CalenderProvider.CONTENT_URI, calenderValues);
+                calenderProvider.insert(CalenderProvider.CONTENT_URI, calenderValues);
             }
         }
 
@@ -400,7 +404,8 @@ public class APIResponseHandler implements ResponseHandler {
                 tripValues.put(DBHelper.TRIP_HEADSIGN, dataObject.getString(DBHelper.TRIP_HEADSIGN));
                 tripValues.put(DBHelper.TRIP_DIRECTION, dataObject.getString(DBHelper.TRIP_DIRECTION));
                 tripValues.put(DBHelper.TRIP_SERVICE_ID, dataObject.getString(DBHelper.TRIP_SERVICE_ID));
-                queryHandler.startInsert(i, null, TripProvider.CONTENT_URI, tripValues);
+//                queryHandler.startInsert(i, null, TripProvider.CONTENT_URI, tripValues);
+                tripProvider.insert(TripProvider.CONTENT_URI, tripValues);
             }
         }
 
@@ -412,7 +417,6 @@ public class APIResponseHandler implements ResponseHandler {
         }
     }
 
-    //todo takes long time to parse, can it be sped up?
     //todo feedback on what stage it is at
 
 }

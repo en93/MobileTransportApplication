@@ -113,7 +113,7 @@ public class StopsNavigationActivity extends AppCompatActivity implements Loader
 
             AtApiManager APIAccess = new AtApiManager();
             APIResponseHandler responseHandler = new APIResponseHandler(findViewById(R.id.navigation_view), c, counter);
-            APIAccess.getAllTrips(c, responseHandler);                //todo consider using download manager as these files are large and
+            APIAccess.getAllTrips(c, responseHandler);
             APIAccess.getAllRoutes(c, responseHandler);
             APIAccess.getAllCalenders(c, responseHandler);
             //todo handle failure better

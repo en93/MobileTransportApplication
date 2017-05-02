@@ -111,7 +111,6 @@ public class AtApiManager {
                 timeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT
         ));
         jsonRequest.setTag(REQUEST_TAG);
-//        updateCallNumbers(1); //todo remove
         requestQueue.add(jsonRequest);
     }
 
@@ -143,7 +142,10 @@ public class AtApiManager {
             }
         }, new Response.ErrorListener() {
             @Override
-            public void onErrorResponse(VolleyError error) {}
+            public void onErrorResponse(VolleyError error) {
+                //todo handle
+                Log.e("Volley_Error" , error.getMessage());
+            }
         }){
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError{
@@ -157,7 +159,6 @@ public class AtApiManager {
                 timeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT
         ));
         jsonRequest.setTag(REQUEST_TAG);
-//        updateCallNumbers(1); //todo remove
         requestQueue.add(jsonRequest);
     }
 
@@ -182,7 +183,9 @@ public class AtApiManager {
             }
         }, new Response.ErrorListener() {
             @Override
-            public void onErrorResponse(VolleyError error) {}
+            public void onErrorResponse(VolleyError error) {
+                //todo handle
+            }
         }){
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError{
