@@ -22,7 +22,8 @@ public class AddNewStopActivity extends AppCompatActivity {
     public static APIResponseHandler responseHandler;
 
     //TODO saying stop is invalid but is still adding successfully?
-
+    //todo handle incorrect stop id input
+    //todo handle attempted duplicate row inserts
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

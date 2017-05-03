@@ -23,7 +23,7 @@ public class ArrivalProvider extends ContentProvider {
     public static final Uri CONTENT_URI = Uri.parse("content://" + AUTHORITY + "/" + BASE_PATH );
 
     private static SQLiteDatabase ATData;
-    public static ArrayList<Integer> requestedButNotCompleted = new ArrayList<Integer>();
+//    public static ArrayList<Integer> requestedButNotCompleted = new ArrayList<Integer>();
 
 
     @Override
@@ -71,10 +71,10 @@ public class ArrivalProvider extends ContentProvider {
         String SQL_CHECK_DB = "SELECT * FROM " + DBHelper.ARRIVAL_TABLE
                 + " WHERE " + DBHelper.ARRIVAL_STOP_ID + " = " + s
                 + " LIMIT 1";
-        if(requestedButNotCompleted.contains(Integer.parseInt(s))){
-            result = true;
-        }
-        else if(ATData.rawQuery(SQL_CHECK_DB, null).getCount()>0){
+//        if(requestedButNotCompleted.contains(Integer.parseInt(s))){
+//            result = true;
+//        }
+        if(ATData.rawQuery(SQL_CHECK_DB, null).getCount()>0){
             result = true;
         }
         return result;

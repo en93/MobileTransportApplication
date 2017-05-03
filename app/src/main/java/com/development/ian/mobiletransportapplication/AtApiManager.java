@@ -258,7 +258,7 @@ public class AtApiManager {
 
     public void getArrivalTimes(final String id, Context context, final APIResponseHandler responseHandler){
 
-        ArrivalProvider.requestedButNotCompleted.add(Integer.parseInt(id));
+//        ArrivalProvider.requestedButNotCompleted.add(Integer.parseInt(id));
         ConfirmQueueRunning(context);
         String requestUrl = REQUEST_Arrival_TIMES_URL  + id;
         final TAG REQUEST_TAG= TAG.getArrivals;
@@ -275,7 +275,7 @@ public class AtApiManager {
                     responseHandler.onFailure(REQUEST_TAG, id, e);
                 } finally {
 //                    updateCallNumbers(-1);
-                    ArrivalProvider.requestedButNotCompleted.remove(new Integer(Integer.parseInt(id)));
+//                    ArrivalProvider.requestedButNotCompleted.remove(new Integer(Integer.parseInt(id)));
                 }
             }
         }, new Response.ErrorListener() {
@@ -454,5 +454,3 @@ public class AtApiManager {
 
     public enum TAG{getStop, getArrivals, getRoute, getCalender, getVersion, getTrip, getTripAll, getRouteAll, getCalenderAll}
 }
-
-//todo detect and handle timeouts

@@ -117,7 +117,7 @@ public class APIResponseHandler implements ResponseHandler {
                 if(stopProvider==null){
                     stopProvider = new StopProvider();
                 }
-                ContentValues stopValues = new ContentValues();
+                ContentValues stopValues = new ContentValues();     //todo handle async rather than in UI thread
                 stopValues.put(DBHelper.STOP_NAME, dataObject.getString(DBHelper.STOP_NAME));
                 stopValues.put(DBHelper.STOP_ID, dataObject.getInt("stop_id")); //consider changing all getters to work like this
                 stopValues.put(DBHelper.STOP_LAT, dataObject.getDouble(DBHelper.STOP_LAT));
@@ -126,11 +126,15 @@ public class APIResponseHandler implements ResponseHandler {
                 stopValues.put(DBHelper.STOP_PARENT, dataObject.getInt(DBHelper.STOP_PARENT));
                 stopProvider.insert(StopProvider.CONTENT_URI, stopValues);
 
+
 //                if(!arrivalProvider.containsKeyValue(stopValues.get(DBHelper.STOP_ID).toString())) {
-//                    APIAccess.getArrivalTimes(stopValues.get(DBHelper.STOP_ID).toString(), context, this);
+                //find arrivals for the station
+                APIAccess.getArrivalTimes(stopValues.get(DBHelper.STOP_ID).toString(), context, this);
+//               }else{
+//                    AddNewStopActivity.restoreUserControl();
 //                }
 
-                AddNewStopActivity.restoreUserControl();
+
                 Snackbar.make(view, "Stop " + stopValues.get(DBHelper.STOP_ID).toString() + " has been added", Snackbar.LENGTH_SHORT).show();
 
             }catch (JSONException e){
@@ -139,7 +143,7 @@ public class APIResponseHandler implements ResponseHandler {
         }
         else if(tag == AtApiManager.TAG.getArrivals){
             try{
-
+//todo make async
                 JSONObject dataObject;
                 for (int i = 0; i<dataArray.length(); i++) {
                     dataObject = dataArray.getJSONObject(i);
@@ -150,10 +154,12 @@ public class APIResponseHandler implements ResponseHandler {
                     arrivalValues.put(DBHelper.ARRIVAL_TIME_SECONDS, dataObject.getString(DBHelper.ARRIVAL_TIME_SECONDS));
                     arrivalProvider.insert(ArrivalProvider.CONTENT_URI, arrivalValues);
 
-                    if(!tripProvider.containsKeyValue(dataObject.getString(DBHelper.ARRIVAL_TRIP_ID))){
-//                        APIAccess.getTripById(dataObject.getString(DBHelper.ARRIVAL_TRIP_ID), context, this);
-                    }
+//                    if(!tripProvider.containsKeyValue(dataObject.getString(DBHelper.ARRIVAL_TRIP_ID))){
+////                        APIAccess.getTripById(dataObject.getString(DBHelper.ARRIVAL_TRIP_ID), context, this);
+//                    }
                 }
+                AddNewStopActivity.restoreUserControl();
+
             }catch (JSONException e){
                 throw e;
             }
