@@ -95,4 +95,4 @@ public class AddNewStopActivity extends AppCompatActivity {
         window.clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
         progressBar.setVisibility(View.GONE);
     }
-}
+}   //todo save time into database as a type rather than string
