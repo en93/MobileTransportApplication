@@ -25,13 +25,14 @@ public class ArrivalProvider extends ContentProvider {
     private static SQLiteDatabase ATData;
 //    public static ArrayList<Integer> requestedButNotCompleted = new ArrayList<Integer>();
 
-    private static String SQL_GET_ARRIVALS =
+    private static String SQL_GET_ARRIVALS = //todo filter for stopID
             "SELECT 0 AS _id, * " + //todo select only what I need
             "FROM arrival a, trip t, calender c " +
             "WHERE a.trip_id = t.trip_id AND t.service_id = c.service_id " + //join tables
             "AND a.arrival_time_seconds > " + //Calculate time since start of day
                     "(strftime('%s','now', 'localtime') - strftime('%s', 'now', 'localtime', 'start of day')) " +
-            "AND ? = 1 " + //todo set coulumn in selection args
+            "AND c.sunday = 1 " + //todo set coulumn in selection args
+            "AND a.stop_id = 7230 " + //todo set in selectionargs
             "AND strftime('%s','now', 'localtime') > strftime('%s', c.start_date, 'localtime') " + //Ensure after start date
             "AND strftime('%s','now', 'localtime') < strftime('%s', c.end_date, 'localtime') " + //Ensure before end date
             "ORDER BY a.arrival_time_seconds " +
@@ -54,7 +55,7 @@ public class ArrivalProvider extends ContentProvider {
     @Override
     public Cursor query(@NonNull Uri uri, @Nullable String[] strings, @Nullable String s, @Nullable String[] strings1, @Nullable String s1) {
 //        return ATData.query(DBHelper.ARRIVAL_TABLE, DBHelper.ARRIVAL_COLUMNS, s, null,null,null, DBHelper.ARRIVAL_TIME_SECONDS + " DESC");
-        Cursor test =ATData.rawQuery(SQL_GET_ARRIVALS, new String[] {String.format("%s.%s", DBHelper.CALENDER_TABLE, DBHelper.CALENDER_SUNDAY)});
+        Cursor test =ATData.rawQuery(SQL_GET_ARRIVALS, null/*new String[] {String.format("%s.%s", DBHelper.CALENDER_TABLE, DBHelper.CALENDER_SUNDAY)}*/);
 //        return ATData.rawQuery(SQL_GET_ARRIVALS, new String[] {String.format("%s.%s", DBHelper.CALENDER_TABLE, DBHelper.CALENDER_SUNDAY)});
         return test; //todo returns -1 count results
     }
