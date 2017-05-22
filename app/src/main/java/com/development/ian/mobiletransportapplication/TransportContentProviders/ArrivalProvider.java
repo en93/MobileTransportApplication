@@ -106,8 +106,8 @@ public class ArrivalProvider extends ContentProvider {
 
         String sql_get_arrivals = //todo filter for stopID
                 "SELECT 0 AS _id, * " + //todo select only what I need
-                        "FROM arrival a, trip t, calender c " + //todo remove hardcoded table names and fields
-                        "WHERE a.trip_id = t.trip_id AND t.service_id = c.service_id " + //join tables
+                        "FROM arrival a, trip t, calender c, route r " + //todo remove hardcoded table names and fields
+                        "WHERE a.trip_id = t.trip_id AND t.service_id = c.service_id AND t.route_id = r.route_id " + //join tables
                         "AND a.arrival_time_seconds > " + //Calculate time since start of day
                         "(strftime('%s','now', 'localtime') - strftime('%s', 'now', 'localtime', 'start of day')) " +
                         "AND c." + dayOfWeek +" = 1 " +
