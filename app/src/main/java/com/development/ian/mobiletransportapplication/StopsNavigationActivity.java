@@ -32,9 +32,6 @@ import com.development.ian.mobiletransportapplication.TransportContentProviders.
 public class StopsNavigationActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
     private CursorAdapter cAdapter;
-//    private StationProvider stationProvider;
-    private StopProvider stopProvider;
-//    private SavedStopProvider savedStopProvider;
     private TripProvider tripProvider;
 
     private static Window window ;
@@ -52,7 +49,6 @@ public class StopsNavigationActivity extends AppCompatActivity implements Loader
         window = getWindow();
         progressBar = (ProgressBar) findViewById(R.id.progressBar4);
         ListView list = (ListView) findViewById(R.id.stopList);
-        stopProvider = new StopProvider();
         cAdapter = new StopsCursorAdapter(this, null, 0);
         list.setAdapter(cAdapter);
         getLoaderManager().initLoader(0,null,this);
@@ -69,47 +65,12 @@ public class StopsNavigationActivity extends AppCompatActivity implements Loader
 
         tripProvider = new TripProvider();
 
-        //setup database
-        if(tripProvider.isEmpty()){
-            //do db request
+        //setup database if data is missing
+        if(tripProvider.isEmpty()){ //todo find a better way to test for missing or old data
             RemoveUserControl();
-            CompletedCounter counter = new CompletedCounter(3); //todo change back to three once testing completed
+            int tablesToSetup = 3;
+            CompletedCounter counter = new CompletedCounter(tablesToSetup);
             Context c = getApplicationContext();
-
-//            //Use to make sure you access the right file
-//            Calendar calender = Calendar.getInstance();
-//            String seconds = ""+calender.get(Calendar.SECOND)+"_" + calender.get(Calendar.MINUTE)+"_"+ calender.get(Calendar.HOUR)+"_" +calender.get(Calendar.DAY_OF_YEAR)+"_"+calender.get(Calendar.YEAR);
-//
-//            DownloadManager dm = (DownloadManager) getSystemService(DOWNLOAD_SERVICE);
-//
-//            DownloadManager.Request request1 = new DownloadManager.Request(Uri.parse(AtApiManager.REQUEST_TRIPS_ALL_URL));
-//            request1.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE); //todo make hidden
-//            request1.setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI | DownloadManager.Request.NETWORK_MOBILE);
-//            request1.addRequestHeader(AtApiManager.SUBKEYLABEL, AtApiManager.KEY);
-//            request1.setTitle("Trips" + seconds+".json");
-//            long r1 = dm.enqueue(request1);
-//
-//            DownloadManager.Request request2 = new DownloadManager.Request(Uri.parse(AtApiManager.REQUEST_CALENDER_ALL_URL));
-//            request2.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE); //todo make hidden
-//            request2.setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI | DownloadManager.Request.NETWORK_MOBILE);
-//            request2.addRequestHeader(AtApiManager.SUBKEYLABEL, AtApiManager.KEY);
-//            request2.setTitle("Calender"+ seconds+".json");
-//            long r2 = dm.enqueue(request2);
-//
-//            DownloadManager.Request request3 = new DownloadManager.Request(Uri.parse(AtApiManager.REQUEST_ROUTES_ALL_URL));
-//            request3.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE); //todo make hidden
-//            request3.setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI | DownloadManager.Request.NETWORK_MOBILE);
-//            request3.addRequestHeader(AtApiManager.SUBKEYLABEL, AtApiManager.KEY);
-//            request3.setTitle("Routes"+ seconds+".json");
-//            long r3 = dm.enqueue(request3);
-//
-//            //todo listen for completion and start adding to db
-//            //todo once all 3 done release control
-//            //todo addmethod to stop download
-//
-//            Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
-
-
 
             AtApiManager APIAccess = new AtApiManager();
             APIResponseHandler responseHandler = new APIResponseHandler(findViewById(R.id.navigation_view), c, counter);

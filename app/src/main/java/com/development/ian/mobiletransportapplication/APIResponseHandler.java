@@ -16,7 +16,6 @@ import com.development.ian.mobiletransportapplication.TransportContentProviders.
 import com.development.ian.mobiletransportapplication.TransportContentProviders.CalenderProvider;
 import com.development.ian.mobiletransportapplication.TransportContentProviders.QueryHandler;
 import com.development.ian.mobiletransportapplication.TransportContentProviders.RouteProvider;
-import com.development.ian.mobiletransportapplication.TransportContentProviders.SavedStopProvider;
 import com.development.ian.mobiletransportapplication.TransportContentProviders.StopProvider;
 import com.development.ian.mobiletransportapplication.TransportContentProviders.TripProvider;
 import com.development.ian.mobiletransportapplication.TransportContentProviders.VersionProvider;
@@ -44,7 +43,7 @@ public class APIResponseHandler implements ResponseHandler {
 
 //    private StationProvider stationProvider = new StationProvider();//todo remove
 
-    private SavedStopProvider savedStopProvider;
+//    private SavedStopProvider savedStopProvider;
     private StopProvider stopProvider;
     private ArrivalProvider arrivalProvider;
     private TripProvider tripProvider;
@@ -59,7 +58,7 @@ public class APIResponseHandler implements ResponseHandler {
     }
 
     private void CreateProviders() {
-        savedStopProvider = new SavedStopProvider();
+//        savedStopProvider = new SavedStopProvider();
          stopProvider = new StopProvider();
          arrivalProvider = new ArrivalProvider();
          tripProvider = new TripProvider();
@@ -92,7 +91,7 @@ public class APIResponseHandler implements ResponseHandler {
 
     @Override
     public void onSuccess(AtApiManager.TAG tag, JSONArray dataArray) throws JSONException { //todo handle exception rather than throwing
-        if(tag == AtApiManager.TAG.getStop){ //todo move to other thread
+        if(tag == AtApiManager.TAG.getStop){ //todo move to other thread                    //todo remove now unused cases
             try {
                 //old
 //
@@ -106,12 +105,12 @@ public class APIResponseHandler implements ResponseHandler {
 //                Snackbar.make(view, "Stop " + stopsValues.get(DBHelper.STOPS_ID) + " has been added", Snackbar.LENGTH_SHORT).show();
                 //end old
 
-                //add to saved stops
                 JSONObject dataObject = dataArray.getJSONObject(0);
 
-                ContentValues savedStopValues = new ContentValues();
-                savedStopValues.put(DBHelper.SAVED_STOP_ID, dataObject.getInt(DBHelper.SAVED_STOP_ID));
-                savedStopProvider.insert(SavedStopProvider.CONTENT_URI, savedStopValues);
+                //table for below is no longer in use
+//                ContentValues savedStopValues = new ContentValues();
+//                savedStopValues.put(DBHelper.SAVED_STOP_ID, dataObject.getInt(DBHelper.SAVED_STOP_ID));
+//                savedStopProvider.insert(SavedStopProvider.CONTENT_URI, savedStopValues);
 
                 //add to stops
                 if(stopProvider==null){
@@ -124,7 +123,7 @@ public class APIResponseHandler implements ResponseHandler {
                 stopValues.put(DBHelper.STOP_LON, dataObject.getDouble(DBHelper.STOP_LON));
                 stopValues.put(DBHelper.STOP_CODE, dataObject.getInt(DBHelper.STOP_CODE));
                 stopValues.put(DBHelper.STOP_PARENT, dataObject.getInt(DBHelper.STOP_PARENT));
-                stopProvider.insert(StopProvider.CONTENT_URI, stopValues);
+                stopProvider.insert(StopProvider.CONTENT_URI, stopValues);  //todo add using same method as others
 
 
 //                if(!arrivalProvider.containsKeyValue(stopValues.get(DBHelper.STOP_ID).toString())) {
@@ -187,7 +186,7 @@ public class APIResponseHandler implements ResponseHandler {
 
                 }
                 if(counter.CanRestoreUserControl()){
-                    StopsNavigationActivity.restoreUserControl(); //todo reconsider this approach
+                    StopsNavigationActivity.restoreUserControl();
                 }
 
                 */
@@ -315,7 +314,7 @@ public class APIResponseHandler implements ResponseHandler {
             calenderValues.put(DBHelper.CALENDER_END, dataObject.getString(DBHelper.CALENDER_END));
             calenderProvider.insert(CalenderProvider.CONTENT_URI, calenderValues);
         }
-    } //todo place inside of iterator just incase there is a case where multiple calanders are returned
+    }
 
 
     @Override
@@ -460,7 +459,7 @@ public class APIResponseHandler implements ResponseHandler {
             JSONObject dataObject;
 //            ContentValues tripValues;
 
-            String sqlInsert = String.format("INSERT INTO %s (%s, %s, %s, %s, %s) VALUES (?,?,?,?,?);",
+            String sqlInsert = String.format("INSERT INTO %s (%s, %s, %s, %s, %s) VALUES (?,?,?,?,?);", //todo handle duplicates when stop added twice
                     DBHelper.TRIP_TABLE, DBHelper.TRIP_ROUTE_ID, DBHelper.TRIP_SERVICE_ID, DBHelper.TRIP_ID, DBHelper.TRIP_HEADSIGN, DBHelper.TRIP_DIRECTION);
             SQLiteStatement statement = db.compileStatement(sqlInsert);
 

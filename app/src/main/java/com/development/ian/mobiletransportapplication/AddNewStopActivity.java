@@ -21,7 +21,6 @@ public class AddNewStopActivity extends AppCompatActivity {
 
     public static APIResponseHandler responseHandler;
 
-    //TODO saying stop is invalid but is still adding successfully?
     //todo handle incorrect stop id input
     //todo handle attempted duplicate row inserts
 
@@ -52,7 +51,7 @@ public class AddNewStopActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 RemoveUserControl();
-                ArrayList<Integer> list = GetSampleStops();
+                ArrayList<Integer> list = GetSampleStops(); //todo handle this better
                 for (Integer b : list) {
                     APIAccess.GetStopById(b.toString(), getApplicationContext(), responseHandler);
                 }
@@ -95,4 +94,4 @@ public class AddNewStopActivity extends AppCompatActivity {
         window.clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
         progressBar.setVisibility(View.GONE);
     }
-}   //todo save time into database as a type rather than string
+}

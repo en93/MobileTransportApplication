@@ -11,8 +11,6 @@ public class BusArrival {
     private String route;
     private String tripId;
     private int arrivalSeconds;
-
-//    private ArrivalAdapter arrivalAdapter;
     private TextView routeTextV;
 
     public final static String PLACE_HOLDER = "...";

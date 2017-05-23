@@ -13,18 +13,8 @@ public class DBHelper extends SQLiteOpenHelper {
     private static DBHelper instance;
 
     final static private String DATABASE_NAME ="AucklandTransport.db";
-    final static private int DATBASE_VERSION = 8;
-
-
-//    public static final String STOPS_TABLE = "stops";
-//    public static final String STOPS_ID = "_id";
-//    public static final String STOPS_LAT = "lat";
-//    public static final String STOPS_LON = "long";
-//    public static final String STOPS_NAME = "name";
-//    public static final String[] STOPS_COLUMNS = {STOPS_ID, STOPS_NAME, STOPS_LAT, STOPS_LAT};
-//    public static final String STOPS_CREATE = "CREATE TABLE "+ STOPS_TABLE + "(" + STOPS_ID + " INTEGER PRIMARY KEY, "
-//            + STOPS_NAME + " varchar(255)," + STOPS_LAT+" float,"+STOPS_LON+" float)";
-
+    final static private int DATBASE_VERSION = 9;
+    //todo add way to clear saved stops or all data
 
 
     //For setting up table of bus stops
@@ -94,7 +84,7 @@ public class DBHelper extends SQLiteOpenHelper {
             + CALENDER__TUESDAY + " INTEGER, " + CALENDER_WEDNESDAY+ " INTEGER, "
             + CALENDER_THURSDAY+ " INTEGER, " + CALENDER_FRIDAY+ " INTEGER, "
             + CALENDER_SATURDAY+ " INTEGER, " + CALENDER_SUNDAY+ " INTEGER, "
-            + CALENDER_START + " VARCHAR(255), " + CALENDER_END + " VARCHAR(255))"; //todo use compouund primary key instead
+            + CALENDER_START + " VARCHAR(255), " + CALENDER_END + " VARCHAR(255))";
 
     //For setting up version table
     public static final String VERSION_TABLE = "version";
@@ -106,12 +96,12 @@ public class DBHelper extends SQLiteOpenHelper {
             + VERSION_ID + " VARCHAR(255) PRIMARY KEY, " + VERSION_START + " VARCHAR(255), "
             + VERSON_END + " VARCHAR(255))";
 
-    //For maintaining saved stations
-    public static final String SAVED_STOP_TABLE = "saved_stops_table";
-    public static final String SAVED_STOP_ID = "stop_id";
-    public static final String[] SAVED_COLUMNS = {SAVED_STOP_ID};
-    public static final String SAVED_STOP_CREATE = "CREATE TABLE " + SAVED_STOP_TABLE + "("
-            + SAVED_STOP_ID + " INTEGER PRIMARY KEY)";
+    //For maintaining saved stations (Add back in later if needed)
+//    public static final String SAVED_STOP_TABLE = "saved_stops_table";
+//    public static final String SAVED_STOP_ID = "stop_id";
+//    public static final String[] SAVED_COLUMNS = {SAVED_STOP_ID};
+//    public static final String SAVED_STOP_CREATE = "CREATE TABLE " + SAVED_STOP_TABLE + "("
+//            + SAVED_STOP_ID + " INTEGER PRIMARY KEY)";
 
 //    public static final String GLOBALS_TABLE = "global";
 //    public static final String GLOBALS_HAS_SETUP= "has_setup";
@@ -129,32 +119,16 @@ public class DBHelper extends SQLiteOpenHelper {
         db.execSQL(ROUTE_CREATE);
         db.execSQL(CALENDER_CREATE);
         db.execSQL(VERSION_CREATE);
-        db.execSQL(SAVED_STOP_CREATE);
         db.execSQL(ARRIVAL_CREATE);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        //todo have clear all rather than specifying manually
-
-        //remove all old names
-        db.execSQL("DROP TABLE IF EXISTS " + "stops"); //todo remove from app
-        db.execSQL("DROP TABLE IF EXISTS " + "stop"); //todo remove from app
-        db.execSQL("DROP TABLE IF EXISTS " + "arrival"); //todo remove from app
-        db.execSQL("DROP TABLE IF EXISTS " + "trip"); //todo remove from app
-        db.execSQL("DROP TABLE IF EXISTS " + "route_table"); //todo remove from app
-        db.execSQL("DROP TABLE IF EXISTS " + "calender_table"); //todo remove from app
-        db.execSQL("DROP TABLE IF EXISTS " + "version_table"); //todo remove from app
-        db.execSQL("DROP TABLE IF EXISTS " + "saved_stops_table"); //todo remove from app
-
-
-
         db.execSQL("DROP TABLE IF EXISTS " + STOP_TABLE);
         db.execSQL("DROP TABLE IF EXISTS " + TRIP_TABLE);
         db.execSQL("DROP TABLE IF EXISTS " + ROUTE_TABLE);
         db.execSQL("DROP TABLE IF EXISTS " + CALENDER_TABLE);
         db.execSQL("DROP TABLE IF EXISTS " + VERSION_TABLE);
-        db.execSQL("DROP TABLE IF EXISTS " + SAVED_STOP_TABLE);
         db.execSQL("DROP TABLE IF EXISTS " + ARRIVAL_TABLE);
         onCreate(db);
     }

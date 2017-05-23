@@ -29,9 +29,7 @@ public class ArrivalsActivity extends AppCompatActivity implements LoaderManager
 
     private CursorAdapter cAdapter;
 
-    public static APIResponseHandler responseHandler;
-
-    private AtApiManager APIAccess = AtApiManager.getInstance();
+//    private AtApiManager APIAccess = AtApiManager.getInstance();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,15 +52,12 @@ public class ArrivalsActivity extends AppCompatActivity implements LoaderManager
         cAdapter = new ArrivalCursorAdapter(this, null, 0);
         list.setAdapter(cAdapter);
         getLoaderManager().initLoader(0,null,this);
-
-//        responseHandler = new APIResponseHandler(findViewById(R.id.arrivals_layout), list, this);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-//        APIAccess.getArrivalTimes(stopNumber, getApplicationContext());
     }
 
     @Override
     public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
-        return new CursorLoader(this, ArrivalProvider.CONTENT_URI, null, null, null, null);
+        return new CursorLoader(this, ArrivalProvider.CONTENT_URI, null, null, new String[]{""+stopNumber}, null);
     }
 
     @Override

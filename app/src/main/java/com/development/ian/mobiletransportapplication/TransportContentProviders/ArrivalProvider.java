@@ -55,18 +55,18 @@ public class ArrivalProvider extends ContentProvider {
 
     @Nullable
     @Override
-    public Cursor query(@NonNull Uri uri, @Nullable String[] strings, @Nullable String s, @Nullable String[] strings1, @Nullable String s1) {
+    public Cursor query(@NonNull Uri uri, @Nullable String[] strings, @Nullable String s, @Nullable String[] selectionArgs, @Nullable String s1) {
         Calendar calendar = Calendar.getInstance(); //get current date and time
         int numRows = 15;
         int rowsSoFar=0;
         ArrayList<Cursor> cursorArrayList = new ArrayList<>();
-        Cursor cursor = getCursor(calendar, uri, strings, s, strings1, s1, numRows);
+        Cursor cursor = getCursor(calendar, uri, strings, s, selectionArgs, s1, numRows);
         rowsSoFar += cursor.getCount();
         cursorArrayList.add(cursor);
         while(rowsSoFar<numRows){
             calendar.add(Calendar.DAY_OF_WEEK, 1);
             int remaining = numRows - cursor.getCount();
-            cursor = getCursor(calendar, uri, strings, s, strings1, s1, remaining);
+            cursor = getCursor(calendar, uri, strings, s, selectionArgs, s1, remaining);
             if(cursor.getCount() == 0){
                 break;
             }
@@ -85,7 +85,7 @@ public class ArrivalProvider extends ContentProvider {
 
     }
 
-    private Cursor getCursor(Calendar calendar, @NonNull Uri uri, @Nullable String[] strings, @Nullable String s, @Nullable String[] strings1, @Nullable String s1, int numRows) {
+    private Cursor getCursor(Calendar calendar, @NonNull Uri uri, @Nullable String[] strings, @Nullable String s, @Nullable String[] selectionArgs, @Nullable String s1, int numRows) {
         String dayOfWeek="";
         switch (calendar.get(Calendar.DAY_OF_WEEK)){
             case Calendar.MONDAY: dayOfWeek = DBHelper.CALENDER_MONDAY;
@@ -104,21 +104,21 @@ public class ArrivalProvider extends ContentProvider {
                 break;
         }
 
-        String sql_get_arrivals = //todo filter for stopID
-                "SELECT 0 AS _id, * " + //todo select only what I need
-                        "FROM arrival a, trip t, calender c, route r " + //todo remove hardcoded table names and fields
-                        "WHERE a.trip_id = t.trip_id AND t.service_id = c.service_id AND t.route_id = r.route_id " + //join tables
-                        "AND a.arrival_time_seconds > " + //Calculate time since start of day
+        String sql_get_arrivals =
+                "SELECT 0 AS _id, r."+DBHelper.ROUTE_SHORT_NAME+", a."+ DBHelper.ARRIVAL_TIME +" " +
+                        "FROM "+ DBHelper.ARRIVAL_TABLE + " a, "+ DBHelper.TRIP_TABLE + " t, " + DBHelper.CALENDER_TABLE +" c, " + DBHelper.ROUTE_TABLE + " r " +
+                        "WHERE a."+DBHelper.ARRIVAL_TRIP_ID+" = t."+DBHelper.TRIP_ID+" " +
+                        "AND t."+DBHelper.TRIP_SERVICE_ID+" = c."+DBHelper.CALENDER_SERVICE_ID+" AND t."+DBHelper.TRIP_ROUTE_ID+" = r."+DBHelper.ROUTE_ID+" " + //join tables
+                        "AND a."+DBHelper.ARRIVAL_TIME_SECONDS+" > " + //Calculate time since start of day
                         "(strftime('%s','now', 'localtime') - strftime('%s', 'now', 'localtime', 'start of day')) " +
                         "AND c." + dayOfWeek +" = 1 " +
-                        "AND a.stop_id = ? " + //todo set in selectionargs
+                        "AND a."+DBHelper.ARRIVAL_STOP_ID+" = ? " +
                         "AND strftime('%s','now', 'localtime') > strftime('%s', c.start_date, 'localtime') " + //Ensure after start date
                         "AND strftime('%s','now', 'localtime') < strftime('%s', c.end_date, 'localtime') " + //Ensure before end date
-                        "ORDER BY a.arrival_time_seconds " +
+                        "ORDER BY a."+DBHelper.ARRIVAL_TIME_SECONDS+" " +
                         "LIMIT " + numRows + ";"
                 ;
-
-        Cursor test =ATData.rawQuery(sql_get_arrivals, new String[]{"7230"});
+        Cursor test =ATData.rawQuery(sql_get_arrivals, selectionArgs);
         return test;
     }
 
