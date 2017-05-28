@@ -29,8 +29,6 @@ public class ArrivalsActivity extends AppCompatActivity implements LoaderManager
 
     private CursorAdapter cAdapter;
 
-//    private AtApiManager APIAccess = AtApiManager.getInstance();
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

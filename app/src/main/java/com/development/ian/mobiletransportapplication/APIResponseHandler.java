@@ -26,6 +26,8 @@ import org.json.JSONObject;
 
 import java.util.Comparator;
 
+import javax.crypto.spec.DHGenParameterSpec;
+
 /**
  * Created by Ian on 3/1/2017.
  */
@@ -40,15 +42,10 @@ public class APIResponseHandler implements ResponseHandler {
     private StopsNavigationActivity.CompletedCounter counter;
 
     private AtApiManager APIAccess = AtApiManager.getInstance();
-
-//    private StationProvider stationProvider = new StationProvider();//todo remove
-
-//    private SavedStopProvider savedStopProvider;
     private StopProvider stopProvider;
     private ArrivalProvider arrivalProvider;
     private TripProvider tripProvider;
     private RouteProvider routeProvider;
-    private VersionProvider versionProvider;
     private CalenderProvider calenderProvider;
 
     public APIResponseHandler(View view, Context context){
@@ -63,7 +60,6 @@ public class APIResponseHandler implements ResponseHandler {
          arrivalProvider = new ArrivalProvider();
          tripProvider = new TripProvider();
          routeProvider = new RouteProvider();
-         versionProvider= new VersionProvider();
          calenderProvider= new CalenderProvider();
     }
 
@@ -90,10 +86,11 @@ public class APIResponseHandler implements ResponseHandler {
 
 
     @Override
-    public void onSuccess(AtApiManager.TAG tag, JSONArray dataArray) throws JSONException { //todo handle exception rather than throwing
-        if(tag == AtApiManager.TAG.getStop){ //todo move to other thread                    //todo remove now unused cases
-            try {
-                //old
+    public void onSuccess(final AtApiManager.TAG tag, JSONArray dataArray) throws JSONException {
+        try {
+            if (tag == AtApiManager.TAG.getStop) {     //todo use async for all cases
+                                                        //todo move all cases over to parser class to decide
+
 //
 //                ContentValues stopsValues = new ContentValues();
 //                stopsValues.put(DBHelper.STOPS_ID, dataObject.getString("stop_id"));
@@ -105,7 +102,14 @@ public class APIResponseHandler implements ResponseHandler {
 //                Snackbar.make(view, "Stop " + stopsValues.get(DBHelper.STOPS_ID) + " has been added", Snackbar.LENGTH_SHORT).show();
                 //end old
 
-                JSONObject dataObject = dataArray.getJSONObject(0);
+                AsyncQueryHandler queryHandler = new QueryHandler(context.getContentResolver());
+                AsyncJsonParser parser = new AsyncJsonParser(queryHandler, dataArray, tag);
+                parser.execute();
+
+                //todo remove case below here EXCEPT start getting arrivals (in here or in PostExcecute?)
+                APIAccess.getArrivalTimes(""+dataArray.getJSONObject(0).getInt("stop_id"), context, this); //todo test this
+
+      /*          JSONObject dataObject = dataArray.getJSONObject(0);
 
                 //table for below is no longer in use
 //                ContentValues savedStopValues = new ContentValues();
@@ -113,7 +117,7 @@ public class APIResponseHandler implements ResponseHandler {
 //                savedStopProvider.insert(SavedStopProvider.CONTENT_URI, savedStopValues);
 
                 //add to stops
-                if(stopProvider==null){
+                if (stopProvider == null) {
                     stopProvider = new StopProvider();
                 }
                 ContentValues stopValues = new ContentValues();     //todo handle async rather than in UI thread
@@ -124,6 +128,7 @@ public class APIResponseHandler implements ResponseHandler {
                 stopValues.put(DBHelper.STOP_CODE, dataObject.getInt(DBHelper.STOP_CODE));
                 stopValues.put(DBHelper.STOP_PARENT, dataObject.getInt(DBHelper.STOP_PARENT));
                 stopProvider.insert(StopProvider.CONTENT_URI, stopValues);  //todo add using same method as others
+                //todo still throwing errors on duplicates
 
 
 //                if(!arrivalProvider.containsKeyValue(stopValues.get(DBHelper.STOP_ID).toString())) {
@@ -131,104 +136,99 @@ public class APIResponseHandler implements ResponseHandler {
                 APIAccess.getArrivalTimes(stopValues.get(DBHelper.STOP_ID).toString(), context, this);
 //               }else{
 //                    AddNewStopActivity.restoreUserControl();
+//                }*/
+
+                //todo show after downloading arrivals
+                Snackbar.make(view, "Stop " + dataArray.getJSONObject(0).getInt("stop_id") + " has been added", Snackbar.LENGTH_SHORT).show();
+
+
+            } else if (tag == AtApiManager.TAG.getArrivals) {
+//                JSONObject dataObject;
+//                for (int i = 0; i < dataArray.length(); i++) {
+//                    dataObject = dataArray.getJSONObject(i);
+//                    ContentValues arrivalValues = new ContentValues();
+//                    arrivalValues.put(DBHelper.ARRIVAL_STOP_ID, dataObject.getString(DBHelper.ARRIVAL_STOP_ID));
+//                    arrivalValues.put(DBHelper.ARRIVAL_TRIP_ID, dataObject.getString(DBHelper.ARRIVAL_TRIP_ID));
+//                    arrivalValues.put(DBHelper.ARRIVAL_TIME, dataObject.getString(DBHelper.ARRIVAL_TIME));
+//                    arrivalValues.put(DBHelper.ARRIVAL_TIME_SECONDS, dataObject.getString(DBHelper.ARRIVAL_TIME_SECONDS));
+//                    arrivalProvider.insert(ArrivalProvider.CONTENT_URI, arrivalValues);
+//
+////                    if(!tripProvider.containsKeyValue(dataObject.getString(DBHelper.ARRIVAL_TRIP_ID))){
+//////                        APIAccess.getTripById(dataObject.getString(DBHelper.ARRIVAL_TRIP_ID), context, this);
+////                    }
 //                }
+////                AddNewStopActivity.restoreUserControl();
+
+                //new code below line, old above
+                AsyncQueryHandler queryHandler = new QueryHandler(context.getContentResolver());
+                AsyncJsonParser parser = new AsyncJsonParser(queryHandler, dataArray, tag);
+                parser.execute();
 
 
-                Snackbar.make(view, "Stop " + stopValues.get(DBHelper.STOP_ID).toString() + " has been added", Snackbar.LENGTH_SHORT).show();
 
-            }catch (JSONException e){
-                throw e;
-            }
-        }
-        else if(tag == AtApiManager.TAG.getArrivals){
-            try{
-//todo make async
-                JSONObject dataObject;
-                for (int i = 0; i<dataArray.length(); i++) {
-                    dataObject = dataArray.getJSONObject(i);
-                    ContentValues arrivalValues = new ContentValues();
-                    arrivalValues.put(DBHelper.ARRIVAL_STOP_ID, dataObject.getString(DBHelper.ARRIVAL_STOP_ID));
-                    arrivalValues.put(DBHelper.ARRIVAL_TRIP_ID, dataObject.getString(DBHelper.ARRIVAL_TRIP_ID));
-                    arrivalValues.put(DBHelper.ARRIVAL_TIME, dataObject.getString(DBHelper.ARRIVAL_TIME));
-                    arrivalValues.put(DBHelper.ARRIVAL_TIME_SECONDS, dataObject.getString(DBHelper.ARRIVAL_TIME_SECONDS));
-                    arrivalProvider.insert(ArrivalProvider.CONTENT_URI, arrivalValues);
 
-//                    if(!tripProvider.containsKeyValue(dataObject.getString(DBHelper.ARRIVAL_TRIP_ID))){
-////                        APIAccess.getTripById(dataObject.getString(DBHelper.ARRIVAL_TRIP_ID), context, this);
-//                    }
-                }
-                AddNewStopActivity.restoreUserControl();
+            } else if (tag == AtApiManager.TAG.getRouteAll) {
 
-            }catch (JSONException e){
-                throw e;
-            }
-        }
-        else if(tag == AtApiManager.TAG.getRouteAll){
-            try {
                 JSONObject dataObject;
                 AsyncQueryHandler queryHandler = new QueryHandler(context.getContentResolver());
 
                 AsyncJsonParser parser = new AsyncJsonParser(queryHandler, dataArray, tag);
                 parser.execute();
 
-                /*
-                for (int i = 0; i<dataArray.length(); i++) {
-                    dataObject = dataArray.getJSONObject(i);
-                    ContentValues routeValues = new ContentValues();
-                    routeValues.put(DBHelper.ROUTE_ID, dataObject.getString(DBHelper.ROUTE_ID));
-                    routeValues.put(DBHelper.ROUTE_AGENCY_ID, dataObject.getString(DBHelper.ROUTE_AGENCY_ID));
-                    routeValues.put(DBHelper.ROUTE_SHORT_NAME, dataObject.getString(DBHelper.ROUTE_SHORT_NAME));
-                    routeValues.put(DBHelper.ROUTE_LONG_NAME, dataObject.getString(DBHelper.ROUTE_LONG_NAME));
+        /*
+        for (int i = 0; i<dataArray.length(); i++) {
+            dataObject = dataArray.getJSONObject(i);
+            ContentValues routeValues = new ContentValues();
+            routeValues.put(DBHelper.ROUTE_ID, dataObject.getString(DBHelper.ROUTE_ID));
+            routeValues.put(DBHelper.ROUTE_AGENCY_ID, dataObject.getString(DBHelper.ROUTE_AGENCY_ID));
+            routeValues.put(DBHelper.ROUTE_SHORT_NAME, dataObject.getString(DBHelper.ROUTE_SHORT_NAME));
+            routeValues.put(DBHelper.ROUTE_LONG_NAME, dataObject.getString(DBHelper.ROUTE_LONG_NAME));
 //                    routeProvider.insert(RouteProvider.CONTENT_URI, routeValues);
 
 
-                    queryHandler.startInsert(i, null, RouteProvider.CONTENT_URI, routeValues);
+            queryHandler.startInsert(i, null, RouteProvider.CONTENT_URI, routeValues);
 
-                }
-                if(counter.CanRestoreUserControl()){
-                    StopsNavigationActivity.restoreUserControl();
-                }
-
-                */
-            }catch (Exception e){
-                throw e;
-            }
         }
-        else if(tag == AtApiManager.TAG.getCalenderAll){
-            try {
+        if(counter.CanRestoreUserControl()){
+            StopsNavigationActivity.restoreUserControl();
+        }
+
+        */
+
+            } else if (tag == AtApiManager.TAG.getCalenderAll) {
+
                 JSONObject dataObject;
                 AsyncQueryHandler queryHandler = new QueryHandler(context.getContentResolver());
 
                 AsyncJsonParser parser = new AsyncJsonParser(queryHandler, dataArray, tag);
                 parser.execute();
 
-                /*
-                for (int i = 0; i<dataArray.length(); i++) {
-                    dataObject = dataArray.getJSONObject(i);
-                    ContentValues calenderValues = new ContentValues();
-                    calenderValues.put(DBHelper.CALENDER_SERVICE_ID, dataObject.getString(DBHelper.CALENDER_SERVICE_ID));
-                    calenderValues.put(DBHelper.CALENDER_MONDAY, dataObject.getInt(DBHelper.CALENDER_MONDAY));
-                    calenderValues.put(DBHelper.CALENDER__TUESDAY, dataObject.getInt(DBHelper.CALENDER__TUESDAY));
-                    calenderValues.put(DBHelper.CALENDER_WEDNESDAY, dataObject.getInt(DBHelper.CALENDER_WEDNESDAY));
-                    calenderValues.put(DBHelper.CALENDER_THURSDAY, dataObject.getInt(DBHelper.CALENDER_THURSDAY));
-                    calenderValues.put(DBHelper.CALENDER_FRIDAY, dataObject.getInt(DBHelper.CALENDER_FRIDAY));
-                    calenderValues.put(DBHelper.CALENDER_SATURDAY, dataObject.getInt(DBHelper.CALENDER_SATURDAY));
-                    calenderValues.put(DBHelper.CALENDER_SUNDAY, dataObject.getInt(DBHelper.CALENDER_SUNDAY));
-                    calenderValues.put(DBHelper.CALENDER_START, dataObject.getString(DBHelper.CALENDER_START));
-                    calenderValues.put(DBHelper.CALENDER_END, dataObject.getString(DBHelper.CALENDER_END));
-                    queryHandler.startInsert(i, null, CalenderProvider.CONTENT_URI, calenderValues);
+        /*
+        for (int i = 0; i<dataArray.length(); i++) {
+            dataObject = dataArray.getJSONObject(i);
+            ContentValues calenderValues = new ContentValues();
+            calenderValues.put(DBHelper.CALENDER_SERVICE_ID, dataObject.getString(DBHelper.CALENDER_SERVICE_ID));
+            calenderValues.put(DBHelper.CALENDER_MONDAY, dataObject.getInt(DBHelper.CALENDER_MONDAY));
+            calenderValues.put(DBHelper.CALENDER__TUESDAY, dataObject.getInt(DBHelper.CALENDER__TUESDAY));
+            calenderValues.put(DBHelper.CALENDER_WEDNESDAY, dataObject.getInt(DBHelper.CALENDER_WEDNESDAY));
+            calenderValues.put(DBHelper.CALENDER_THURSDAY, dataObject.getInt(DBHelper.CALENDER_THURSDAY));
+            calenderValues.put(DBHelper.CALENDER_FRIDAY, dataObject.getInt(DBHelper.CALENDER_FRIDAY));
+            calenderValues.put(DBHelper.CALENDER_SATURDAY, dataObject.getInt(DBHelper.CALENDER_SATURDAY));
+            calenderValues.put(DBHelper.CALENDER_SUNDAY, dataObject.getInt(DBHelper.CALENDER_SUNDAY));
+            calenderValues.put(DBHelper.CALENDER_START, dataObject.getString(DBHelper.CALENDER_START));
+            calenderValues.put(DBHelper.CALENDER_END, dataObject.getString(DBHelper.CALENDER_END));
+            queryHandler.startInsert(i, null, CalenderProvider.CONTENT_URI, calenderValues);
 //                    calenderProvider.insert(CalenderProvider.CONTENT_URI, calenderValues);
-                }
-                if(counter.CanRestoreUserControl()){
-                    StopsNavigationActivity.restoreUserControl();
-                }
-                */
-            }catch (Exception e){
-                throw e;
-            }
         }
-        else if(tag == AtApiManager.TAG.getRoute){
-            try {
+        if(counter.CanRestoreUserControl()){
+            StopsNavigationActivity.restoreUserControl();
+        }
+        */
+
+            }
+            /*                  obsolete case
+            else if (tag == AtApiManager.TAG.getRoute) {
+
                 JSONObject dataObject = dataArray.getJSONObject(0);
                 ContentValues routeValues = new ContentValues();
                 routeValues.put(DBHelper.ROUTE_ID, dataObject.getString(DBHelper.ROUTE_ID));
@@ -236,38 +236,34 @@ public class APIResponseHandler implements ResponseHandler {
                 routeValues.put(DBHelper.ROUTE_SHORT_NAME, dataObject.getString(DBHelper.ROUTE_SHORT_NAME));
                 routeValues.put(DBHelper.ROUTE_LONG_NAME, dataObject.getString(DBHelper.ROUTE_LONG_NAME));
                 routeProvider.insert(RouteProvider.CONTENT_URI, routeValues);
-            }catch (JSONException e){
-                throw e;
-            }
-        }
-        else if(tag == AtApiManager.TAG.getTrip){
-            JSONObject dataObject = dataArray.getJSONObject(0);
-            ContentValues tripValues = new ContentValues();
-            tripValues.put(DBHelper.TRIP_ID, dataObject.getString(DBHelper.TRIP_ID));
-            tripValues.put(DBHelper.TRIP_ROUTE_ID, dataObject.getString(DBHelper.TRIP_ROUTE_ID));
-            tripValues.put(DBHelper.TRIP_HEADSIGN, dataObject.getString(DBHelper.TRIP_HEADSIGN));
-            tripValues.put(DBHelper.TRIP_DIRECTION, dataObject.getString(DBHelper.TRIP_DIRECTION));
-            tripValues.put(DBHelper.TRIP_SERVICE_ID, dataObject.getString(DBHelper.TRIP_SERVICE_ID));
-            tripProvider.insert(TripProvider.CONTENT_URI, tripValues);
 
-            //Call for route values using routeID
-            if(!routeProvider.containsKeyValue(dataObject.getString(DBHelper.TRIP_ROUTE_ID))) {
-//                APIAccess.getRouteById(dataObject.getString(DBHelper.TRIP_ROUTE_ID), this);
-            }
+            } else if (tag == AtApiManager.TAG.getTrip) {
+                JSONObject dataObject = dataArray.getJSONObject(0);
+                ContentValues tripValues = new ContentValues();
+                tripValues.put(DBHelper.TRIP_ID, dataObject.getString(DBHelper.TRIP_ID));
+                tripValues.put(DBHelper.TRIP_ROUTE_ID, dataObject.getString(DBHelper.TRIP_ROUTE_ID));
+                tripValues.put(DBHelper.TRIP_HEADSIGN, dataObject.getString(DBHelper.TRIP_HEADSIGN));
+                tripValues.put(DBHelper.TRIP_DIRECTION, dataObject.getString(DBHelper.TRIP_DIRECTION));
+                tripValues.put(DBHelper.TRIP_SERVICE_ID, dataObject.getString(DBHelper.TRIP_SERVICE_ID));
+                tripProvider.insert(TripProvider.CONTENT_URI, tripValues);
 
-            //Call for calender values by serviceID
-            if(!calenderProvider.containsKeyValue(dataObject.getString(DBHelper.TRIP_SERVICE_ID))) {
-//                APIAccess.getCalenderById(dataObject.getString(DBHelper.TRIP_SERVICE_ID), this);
-            }
-        }
+//                //Call for route values using routeID
+//                if (!routeProvider.containsKeyValue(dataObject.getString(DBHelper.TRIP_ROUTE_ID))) {
+////                APIAccess.getRouteById(dataObject.getString(DBHelper.TRIP_ROUTE_ID), this);
+//                }
 
-        /* TODO testing async here*/
-        else if(tag == AtApiManager.TAG.getTripAll){
+//                //Call for calender values by serviceID
+//                if (!calenderProvider.containsKeyValue(dataObject.getString(DBHelper.TRIP_SERVICE_ID))) {
+////                APIAccess.getCalenderById(dataObject.getString(DBHelper.TRIP_SERVICE_ID), this);
+//                }
+            }*/
+
+            else if (tag == AtApiManager.TAG.getTripAll) {
 //            JSONObject dataObject = dataArray.getJSONObject(0);
-            AsyncQueryHandler queryHandler = new QueryHandler(context.getContentResolver());
+                AsyncQueryHandler queryHandler = new QueryHandler(context.getContentResolver());
 
-            AsyncJsonParser parser = new AsyncJsonParser(queryHandler, dataArray, tag);
-            parser.execute();
+                AsyncJsonParser parser = new AsyncJsonParser(queryHandler, dataArray, tag);
+                parser.execute();
 
 //            JSONObject dataObject;
 //            for (int i = 0; i< dataArray.length(); i++) {
@@ -283,10 +279,10 @@ public class APIResponseHandler implements ResponseHandler {
 //            if(counter.CanRestoreUserControl()){
 //                StopsNavigationActivity.restoreUserControl();
 //            }
-        //todo end testing
 
 
-            //Call for route values using routeID
+
+                //Call for route values using routeID
 //            if(!routeProvider.containsKeyValue(dataObject.getString(DBHelper.TRIP_ROUTE_ID))) {
 ////                APIAccess.getRouteById(dataObject.getString(DBHelper.TRIP_ROUTE_ID), this);
 //            }
@@ -295,26 +291,32 @@ public class APIResponseHandler implements ResponseHandler {
 //            if(!calenderProvider.containsKeyValue(dataObject.getString(DBHelper.TRIP_SERVICE_ID))) {
 ////                APIAccess.getCalenderById(dataObject.getString(DBHelper.TRIP_SERVICE_ID), this);
 //            }
-        }
-        else if(tag == AtApiManager.TAG.getCalender){
-            if(calenderProvider ==null){
-                calenderProvider = new CalenderProvider();
             }
-            JSONObject dataObject = dataArray.getJSONObject(0);
-            ContentValues calenderValues = new ContentValues();
-            calenderValues.put(DBHelper.CALENDER_SERVICE_ID, dataObject.getString(DBHelper.CALENDER_SERVICE_ID));
-            calenderValues.put(DBHelper.CALENDER_MONDAY, dataObject.getInt(DBHelper.CALENDER_MONDAY));
-            calenderValues.put(DBHelper.CALENDER__TUESDAY, dataObject.getInt(DBHelper.CALENDER__TUESDAY));
-            calenderValues.put(DBHelper.CALENDER_WEDNESDAY, dataObject.getInt(DBHelper.CALENDER_WEDNESDAY));
-            calenderValues.put(DBHelper.CALENDER_THURSDAY, dataObject.getInt(DBHelper.CALENDER_THURSDAY));
-            calenderValues.put(DBHelper.CALENDER_FRIDAY, dataObject.getInt(DBHelper.CALENDER_FRIDAY));
-            calenderValues.put(DBHelper.CALENDER_SATURDAY, dataObject.getInt(DBHelper.CALENDER_SATURDAY));
-            calenderValues.put(DBHelper.CALENDER_SUNDAY, dataObject.getInt(DBHelper.CALENDER_SUNDAY));
-            calenderValues.put(DBHelper.CALENDER_START, dataObject.getString(DBHelper.CALENDER_START));
-            calenderValues.put(DBHelper.CALENDER_END, dataObject.getString(DBHelper.CALENDER_END));
-            calenderProvider.insert(CalenderProvider.CONTENT_URI, calenderValues);
+            /* obsolete case
+            else if (tag == AtApiManager.TAG.getCalender) {
+                if (calenderProvider == null) {
+                    calenderProvider = new CalenderProvider();
+                }
+                JSONObject dataObject = dataArray.getJSONObject(0);
+                ContentValues calenderValues = new ContentValues();
+                calenderValues.put(DBHelper.CALENDER_SERVICE_ID, dataObject.getString(DBHelper.CALENDER_SERVICE_ID));
+                calenderValues.put(DBHelper.CALENDER_MONDAY, dataObject.getInt(DBHelper.CALENDER_MONDAY));
+                calenderValues.put(DBHelper.CALENDER__TUESDAY, dataObject.getInt(DBHelper.CALENDER__TUESDAY));
+                calenderValues.put(DBHelper.CALENDER_WEDNESDAY, dataObject.getInt(DBHelper.CALENDER_WEDNESDAY));
+                calenderValues.put(DBHelper.CALENDER_THURSDAY, dataObject.getInt(DBHelper.CALENDER_THURSDAY));
+                calenderValues.put(DBHelper.CALENDER_FRIDAY, dataObject.getInt(DBHelper.CALENDER_FRIDAY));
+                calenderValues.put(DBHelper.CALENDER_SATURDAY, dataObject.getInt(DBHelper.CALENDER_SATURDAY));
+                calenderValues.put(DBHelper.CALENDER_SUNDAY, dataObject.getInt(DBHelper.CALENDER_SUNDAY));
+                calenderValues.put(DBHelper.CALENDER_START, dataObject.getString(DBHelper.CALENDER_START));
+                calenderValues.put(DBHelper.CALENDER_END, dataObject.getString(DBHelper.CALENDER_END));
+                calenderProvider.insert(CalenderProvider.CONTENT_URI, calenderValues);
+            }*/
+
+        }catch (JSONException e){
+            Log.e("JSON_Exception", e.getMessage());
         }
     }
+
 
 
     @Override
@@ -340,6 +342,7 @@ public class APIResponseHandler implements ResponseHandler {
         JSONArray dataArray;
         AtApiManager.TAG tag;
         SQLiteDatabase db;
+        JSONObject dataObject;
 
         AsyncJsonParser(AsyncQueryHandler a, JSONArray j, AtApiManager.TAG t){
             queryHandler = a;
@@ -350,7 +353,6 @@ public class APIResponseHandler implements ResponseHandler {
 
         @Override
         protected Void doInBackground(Void... voids) {
-            //todo use switch to decide method to use to create
             try {
                 if (tag == AtApiManager.TAG.getTripAll) {
                     parseTrips();
@@ -358,37 +360,42 @@ public class APIResponseHandler implements ResponseHandler {
                     parseRoute();
                 }else if(tag == AtApiManager.TAG.getCalenderAll){
                     parseCalender();
+                }else if(tag == AtApiManager.TAG.getArrivals){
+                    parseArrivals();
+                }else if (tag == AtApiManager.TAG.getStop){
+                    parseStop();
                 }
-            }catch (JSONException e){                //todo handle
+            }catch (JSONException e){
                 Log.e("JSON_Exception", e.getMessage());
-            }catch (Exception e){                //todo handle
-                Log.e("Other_exception", e.getMessage());
             }
             return null;
         }
 
-        private void parseRoute() throws JSONException {
-            JSONObject dataObject;
-//            ContentValues routeValues;
-//            ContentValues[] values = new ContentValues[dataArray.length()];
+        private void parseStop() throws JSONException{
+            String sqlInsert = String.format("INSERT OR IGNORE INTO %s (%s, %s, %s, %s, %s, %s) VALUES (?,?,?,?,?,?);",
+                    DBHelper.STOP_TABLE, DBHelper.STOP_NAME, DBHelper.STOP_ID, DBHelper.STOP_LAT, DBHelper.STOP_LON, DBHelper.STOP_CODE, DBHelper.STOP_PARENT);
+            SQLiteStatement statement = db.compileStatement(sqlInsert);
 
-            String sqlInsert = String.format("INSERT INTO %s (%s, %s, %s, %s) VALUES (?,?,?,?);",
+            db.beginTransaction();
+            dataObject = dataArray.getJSONObject(0);
+            statement.bindString(1, dataObject.getString(DBHelper.STOP_NAME));
+            statement.bindLong(2, dataObject.getInt("stop_id"));
+            statement.bindDouble(3, dataObject.getDouble(DBHelper.STOP_LAT));
+            statement.bindDouble(4, dataObject.getDouble(DBHelper.STOP_LON));
+            statement.bindLong(5, dataObject.getInt(DBHelper.STOP_CODE));
+            statement.bindLong(6, dataObject.getInt(DBHelper.STOP_PARENT));
+            statement.execute();
+            db.setTransactionSuccessful();
+            db.endTransaction();
+        }
+
+        private void parseRoute() throws JSONException {
+            String sqlInsert = String.format("INSERT OR IGNORE INTO %s (%s, %s, %s, %s) VALUES (?,?,?,?);",
                     DBHelper.ROUTE_TABLE, DBHelper.ROUTE_ID, DBHelper.ROUTE_AGENCY_ID, DBHelper.ROUTE_SHORT_NAME, DBHelper.ROUTE_LONG_NAME);
             SQLiteStatement statement = db.compileStatement(sqlInsert);
 
             db.beginTransaction();
             for (int i = 0; i < dataArray.length(); i++) {
-
-            /* //works but is too slow
-            dataObject = dataArray.getJSONObject(i);
-            routeValues = new ContentValues();
-            routeValues.put(DBHelper.ROUTE_ID, dataObject.getString(DBHelper.ROUTE_ID));
-            routeValues.put(DBHelper.ROUTE_AGENCY_ID, dataObject.getString(DBHelper.ROUTE_AGENCY_ID));
-            routeValues.put(DBHelper.ROUTE_SHORT_NAME, dataObject.getString(DBHelper.ROUTE_SHORT_NAME));
-            routeValues.put(DBHelper.ROUTE_LONG_NAME, dataObject.getString(DBHelper.ROUTE_LONG_NAME));
-//                queryHandler.startInsert(i, null, RouteProvider.CONTENT_URI, routeValues);
-//                routeProvider.insert(RouteProvider.CONTENT_URI, routeValues);
-*/
                 dataObject = dataArray.getJSONObject(i);
                 statement.clearBindings();
                 statement.bindString(1, dataObject.getString(DBHelper.ROUTE_ID));
@@ -396,21 +403,13 @@ public class APIResponseHandler implements ResponseHandler {
                 statement.bindString(3, dataObject.getString(DBHelper.ROUTE_SHORT_NAME));
                 statement.bindString(4, dataObject.getString(DBHelper.ROUTE_LONG_NAME));
                 statement.execute();
-
-//                values[i] = routeValues;
             }
-
             db.setTransactionSuccessful();
             db.endTransaction();
-//            context.getContentResolver().bulkInsert(RouteProvider.CONTENT_URI,values);
         }
 
         private void parseCalender() throws JSONException {
-            JSONObject dataObject;
-//            ContentValues calenderValues;
-//            ContentValues[] values = new ContentValues[dataArray.length()];
-
-            String sqlInsert = String.format("INSERT INTO %s (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s) VALUES (?,?,?,?,?,?,?,?,?,?);",
+            String sqlInsert = String.format("INSERT OR IGNORE INTO %s (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s) VALUES (?,?,?,?,?,?,?,?,?,?);",
                     DBHelper.CALENDER_TABLE, DBHelper.CALENDER_SERVICE_ID, DBHelper.CALENDER_MONDAY,
                     DBHelper.CALENDER__TUESDAY, DBHelper.CALENDER_WEDNESDAY, DBHelper.CALENDER_THURSDAY,
                     DBHelper.CALENDER_FRIDAY, DBHelper.CALENDER_SATURDAY, DBHelper.CALENDER_SUNDAY,
@@ -419,23 +418,6 @@ public class APIResponseHandler implements ResponseHandler {
 
             db.beginTransaction();
             for (int i = 0; i<dataArray.length(); i++) {
-                /*
-                dataObject = dataArray.getJSONObject(i);
-                calenderValues = new ContentValues();
-                calenderValues.put(DBHelper.CALENDER_SERVICE_ID, dataObject.getString(DBHelper.CALENDER_SERVICE_ID));
-                calenderValues.put(DBHelper.CALENDER_MONDAY, dataObject.getInt(DBHelper.CALENDER_MONDAY));
-                calenderValues.put(DBHelper.CALENDER__TUESDAY, dataObject.getInt(DBHelper.CALENDER__TUESDAY));
-                calenderValues.put(DBHelper.CALENDER_WEDNESDAY, dataObject.getInt(DBHelper.CALENDER_WEDNESDAY));
-                calenderValues.put(DBHelper.CALENDER_THURSDAY, dataObject.getInt(DBHelper.CALENDER_THURSDAY));
-                calenderValues.put(DBHelper.CALENDER_FRIDAY, dataObject.getInt(DBHelper.CALENDER_FRIDAY));
-                calenderValues.put(DBHelper.CALENDER_SATURDAY, dataObject.getInt(DBHelper.CALENDER_SATURDAY));
-                calenderValues.put(DBHelper.CALENDER_SUNDAY, dataObject.getInt(DBHelper.CALENDER_SUNDAY));
-                calenderValues.put(DBHelper.CALENDER_START, dataObject.getString(DBHelper.CALENDER_START));
-                calenderValues.put(DBHelper.CALENDER_END, dataObject.getString(DBHelper.CALENDER_END));
-//                queryHandler.startInsert(i, null, CalenderProvider.CONTENT_URI, calenderValues);
-//                calenderProvider.insert(CalenderProvider.CONTENT_URI, calenderValues);
-//                values[i] = calenderValues;
-*/
                 dataObject = dataArray.getJSONObject(i);
                 statement.clearBindings();
                 statement.bindString(1, dataObject.getString(DBHelper.CALENDER_SERVICE_ID));
@@ -452,31 +434,15 @@ public class APIResponseHandler implements ResponseHandler {
             }
             db.setTransactionSuccessful();
             db.endTransaction();
-//            context.getContentResolver().bulkInsert(CalenderProvider.CONTENT_URI, values);
         }
 
         private void parseTrips() throws JSONException {
-            JSONObject dataObject;
-//            ContentValues tripValues;
-
-            String sqlInsert = String.format("INSERT INTO %s (%s, %s, %s, %s, %s) VALUES (?,?,?,?,?);", //todo handle duplicates when stop added twice
+            String sqlInsert = String.format("INSERT OR IGNORE INTO %s (%s, %s, %s, %s, %s) VALUES (?,?,?,?,?);", //todo handle duplicates when stop added twice
                     DBHelper.TRIP_TABLE, DBHelper.TRIP_ROUTE_ID, DBHelper.TRIP_SERVICE_ID, DBHelper.TRIP_ID, DBHelper.TRIP_HEADSIGN, DBHelper.TRIP_DIRECTION);
             SQLiteStatement statement = db.compileStatement(sqlInsert);
 
-//            ContentValues[] values = new ContentValues[dataArray.length()];
             db.beginTransaction();
             for (int i = 0; i< dataArray.length(); i++) {
-             /*   dataObject = dataArray.getJSONObject(i);
-                tripValues = new ContentValues();
-                tripValues.put(DBHelper.TRIP_ID, dataObject.getString(DBHelper.TRIP_ID));
-                tripValues.put(DBHelper.TRIP_ROUTE_ID, dataObject.getString(DBHelper.TRIP_ROUTE_ID));
-                tripValues.put(DBHelper.TRIP_HEADSIGN, dataObject.getString(DBHelper.TRIP_HEADSIGN));
-                tripValues.put(DBHelper.TRIP_DIRECTION, dataObject.getString(DBHelper.TRIP_DIRECTION));
-                tripValues.put(DBHelper.TRIP_SERVICE_ID, dataObject.getString(DBHelper.TRIP_SERVICE_ID));
-//                queryHandler.startInsert(i, null, TripProvider.CONTENT_URI, tripValues);
-//                tripProvider.insert(TripProvider.CONTENT_URI, tripValues);
-//                values[i] = tripValues;
-*/
                 dataObject = dataArray.getJSONObject(i);
                 statement.clearBindings();
                 statement.bindString(1, dataObject.getString(DBHelper.TRIP_ROUTE_ID));
@@ -485,21 +451,45 @@ public class APIResponseHandler implements ResponseHandler {
                 statement.bindString(4, dataObject.getString(DBHelper.TRIP_HEADSIGN));
                 statement.bindString(5, dataObject.getString(DBHelper.TRIP_DIRECTION));
                 statement.execute();
-
             }
             db.setTransactionSuccessful();
             db.endTransaction();
-//            context.getContentResolver().bulkInsert(TripProvider.CONTENT_URI,values);
+        }
+
+        private void parseArrivals() throws JSONException {
+            String sqlInsert = String.format("INSERT OR IGNORE INTO %s (%s,%s,%s,%s) VALUES (?,?,?,?);",
+                    DBHelper.ARRIVAL_TABLE, DBHelper.ARRIVAL_STOP_ID, DBHelper.ARRIVAL_TRIP_ID, DBHelper.ARRIVAL_TIME, DBHelper.ARRIVAL_TIME_SECONDS);
+            SQLiteStatement statement = db.compileStatement(sqlInsert);
+            db.beginTransaction();
+
+            for (int i = 0; i< dataArray.length(); i++) {
+                dataObject = dataArray.getJSONObject(i);
+                statement.bindLong(1, dataObject.getInt(DBHelper.ARRIVAL_STOP_ID));
+                statement.bindString(2, dataObject.getString(DBHelper.ARRIVAL_TRIP_ID));
+                statement.bindString(3, dataObject.getString(DBHelper.ARRIVAL_TIME));
+                statement.bindLong(4, dataObject.getInt(DBHelper.ARRIVAL_TIME_SECONDS));
+                statement.execute();
+            }
+            db.setTransactionSuccessful();
+            db.endTransaction();
+
+
         }
 
         @Override
         protected void onPostExecute(Void v){
-            if(counter.CanRestoreUserControl()){
-                StopsNavigationActivity.restoreUserControl();
+            if(tag == AtApiManager.TAG.getCalenderAll || tag == AtApiManager.TAG.getRouteAll || tag == AtApiManager.TAG.getTripAll) {
+                if (counter.CanRestoreUserControl()) {           //todo come up with more elegant way to release
+                    StopsNavigationActivity.restoreUserControl();
+                }
+            }else if(tag == AtApiManager.TAG.getArrivals){
+                AddNewStopActivity.restoreUserControl();
             }
         }
     }
 
     //todo feedback on what stage it is at
+
+    //todo unique failed not being caught will crash program after changing arrivals and placing all trips inside single try block, find cause and eliminate
 
 }

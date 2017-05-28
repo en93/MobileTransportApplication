@@ -38,10 +38,6 @@
             <!--android:authorities="com.example.ian.MobileTransportApplication.StationProvider"-->
             <!--android:exported="false"/>-->
 
-        <provider
-            android:name=".TransportContentProviders.SavedStopProvider"
-            android:authorities="com.example.ian.MobileTransportApplication.SavedStopProvider"
-            android:exported="false"/>
 
         <provider
             android:name=".TransportContentProviders.StopProvider"
